@@ -3,155 +3,326 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UP Health Regional Lab Availability Dashboard</title>
+    <title>Live Lab Test Availability Status Portal - UP Health</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 20px; background: #f4f6f9; color: #333; }
-        .container { max-width: 1100px; margin: 0 auto; }
-        h1 { color: #0056b3; border-bottom: 3px solid #0056b3; padding-bottom: 12px; margin-bottom: 5px; }
-        .meta-info { margin-bottom: 25px; font-style: italic; color: #666; font-size: 14px; }
-        .selector-box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 25px; }
-        select { padding: 10px 14px; font-size: 16px; border-radius: 4px; border: 1px solid #ccc; width: 100%; max-width: 350px; margin-top: 8px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 18px; }
-        .card { background: white; padding: 18px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-left: 6px solid #28a745; transition: transform 0.2s; }
-        .card:hover { transform: translateY(-2px); }
-        .card.down { border-left-color: #dc3545; background: #fff5f5; }
-        .badge { display: inline-block; padding: 4px 10px; font-size: 12px; font-weight: bold; border-radius: 4px; color: white; text-transform: uppercase; margin-bottom: 10px; }
-        .badge.available { background: #28a745; }
-        .badge.down { background: #dc3545; }
-        .test-title { font-size: 18px; margin: 0 0 8px 0; color: #2c3e50; }
-        .reason { font-size: 13px; color: #c0392b; margin-top: 6px; font-weight: bold; }
-        .loading { font-size: 20px; color: #0056b3; text-align: center; padding: 40px; font-weight: bold; }
+        body { background-color: #f6f8fb; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #2d3748; }
+        
+        /* Premium Header Styling */
+        .dashboard-header { background: linear-gradient(135deg, #1a365d, #2b6cb0); color: white; padding: 2.5rem 1rem; box-shadow: 0 4px 20px rgba(26, 54, 93, 0.15); border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; }
+        .dashboard-header h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; }
+        .dashboard-header .lead { font-size: 1.05rem; opacity: 0.85; font-weight: 500; }
+        
+        /* Modern Floating Control Deck */
+        .control-card { background: white; border: none; border-radius: 20px; box-shadow: 0 12px 30px rgba(0,0,0,0.04); padding: 1.75rem; margin-top: -2.5rem; margin-bottom: 2.5rem; border: 1px solid rgba(255,255,255,0.8); }
+        .control-card label { font-size: 0.85rem; font-weight: 700; color: #4a5568; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.6rem; }
+        .form-select, .form-control { border-radius: 12px; border: 1.5px solid #e2e8f0; font-size: 1rem; transition: all 0.2s ease; }
+        .form-select:focus, .form-control:focus { border-color: #3182ce; box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15); }
+        
+        /* Main Analytics Sheet */
+        .status-card { background: white; border: none; border-radius: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.03); padding: 2rem; }
+        .status-badge { font-size: 0.85rem; padding: 0.6rem 1.2rem; border-radius: 50px; font-weight: 700; display: inline-block; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .status-updated { background-color: #e6fffa; color: #00684a; border: 1px solid #b2f5ea; }
+        .status-pending { background-color: #fffaf0; color: #dd6b20; border: 1px solid #feebc8; animation: pulse 2s infinite; }
+        .status-error { background-color: #fff5f5; color: #e53e3e; border: 1px solid #fed7d7; }
+        
+        /* Glassmorphic Stats Track Counters */
+        .counter-banner { background: #f7fafc; border-radius: 16px; border: 1px solid #edf2f7; padding: 1.25rem !important; }
+        .counter-pill { background: white; padding: 0.6rem 1.2rem; border-radius: 12px; font-weight: 700; font-size: 0.95rem; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 8px; border: 1px solid #edf2f7; }
+        
+        /* Native App Style Diagnostics Cards Group */
+        .dept-section-title { font-size: 1.25rem; font-weight: 800; color: #2b6cb0; margin: 2rem 0 1rem 0; padding-bottom: 0.4rem; border-bottom: 2px solid #edf2f7; }
+        
+        .test-card-item { background: white; border: 1px solid #edf2f7; border-radius: 16px; padding: 1.25rem; box-shadow: 0 4px 12px rgba(0,0,0,0.01); display: flex; align-items: center; justify-content: space-between; transition: all 0.2s ease; gap: 1rem; }
+        .test-card-active { background-color: #ffffff; border-left: 5px solid #48bb78; }
+        .test-card-inactive { background-color: #fffafb; border: 1px solid #fed7d7; border-left: 5px solid #e53e3e; }
+        
+        .test-card-left { flex: 1; display: flex; flex-direction: column; }
+        .test-card-title { font-size: 1.1rem; font-weight: 700; color: #1a202c; line-height: 1.3; margin: 0; }
+        
+        /* Badges Formatting */
+        .pill-status { font-size: 0.8rem; font-weight: 800; padding: 0.45rem 1rem; border-radius: 10px; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; line-height: 1.2; min-width: 130px; flex-shrink: 0; }
+        .pill-available { background: linear-gradient(135deg, #48bb78, #38a169); color: white; }
+        .pill-unavailable { background: linear-gradient(135deg, #f56565, #e53e3e); color: white; }
+        
+        /* Sub-text Error Reasons Layout styling */
+        .reason-subtext-container { margin-top: 0.4rem; display: block; }
+        .reason-en { font-size: 0.9rem; color: #800000; font-weight: 700; display: inline-block; margin-right: 0.5rem; }
+        .reason-hi { font-size: 0.85rem; color: #800000; font-weight: 600; display: inline-block; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
+        /* Mobile Adjustments */
+        @media screen and (max-width: 480px) {
+            .test-card-item { padding: 1rem; }
+            .test-card-title { font-size: 1rem; }
+            .pill-status { min-width: 115px; font-size: 0.75rem; }
+            .reason-en { display: block; margin-bottom: 0.1rem; }
+            .reason-hi { display: block; }
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1 id="dashboard-title">Live Lab Test Availability Status Portal</h1>
-    <div class="meta-info" id="district-info">Statewide Health Infrastructure Services Tracking Network</div>
-
-    <div class="selector-box">
-        <label for="facility-select"><strong>🏥 Select Laboratory Block / चिकित्सा इकाई का चयन करें:</strong></label><br>
-        <select id="facility-select" onchange="fetchDowntimeData()">
-            </select>
+    <div class="dashboard-header text-center">
+        <div class="container">
+            <h1 class="mb-2">उत्तर प्रदेश स्वास्थ्य विभाग</h1>
+            <p class="lead mb-3">Live Laboratory Test Availability Status Tracker (<span id="title-district-name">Loading...</span> District)</p>
+            <div class="badge bg-white text-dark fw-bold px-3 py-2 shadow-sm" id="current-date-badge" style="font-size: 0.9rem; border-radius: 8px;">Date: Loading...</div>
+        </div>
     </div>
 
-    <div id="status-container" class="loading" style="display:none;">Loading data from secure CDN layers...</div>
-    <div id="test-grid" class="grid"></div>
-</div>
+    <div class="container">
+        <div class="control-card">
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label class="form-label">Select Laboratory Facility / प्रयोगशाला इकाई का चयन करें</label>
+                    <select class="form-select form-select-lg py-2" id="facility-selector" onchange="renderActiveFacilityData()">
+                        <!-- Dynamic options -->
+                    </select>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label">Search Diagnostic Test / जांच का नाम खोजें</label>
+                    <input type="text" class="form-control form-control-lg py-2" id="search-bar" placeholder="Type shorthand or name (e.g. TLC, Hb, Sugar)..." oninput="filterTestTable()">
+                </div>
+            </div>
+        </div>
+    </div>
 
-<script>
-/**
- * =========================================================================
- * 🗺️ STATEWIDE REGIONAL REGISTRY MAP
- * Scaling is simple: just add new folders and local CHC names right here!
- * =========================================================================
- */
-const STATEWIDE_REGISTRY = {
-    "lucknow": {
-        "name": "Lucknow (लखनऊ)",
-        "dataPath": "./lucknow/Data.json",
-        "facilities": ["CHC Gosaiganj", "CHC Kakori", "CHC Malihabad", "CHC Chinhat", "CHC Mohanlalganj", "CHC Bakshi Ka Talab", "CHC Mal", "CHC Sarojini Nagar"]
-    },
-    "agra": {
-        "name": "Agra (आगरा)",
-        "dataPath": "./agra/Data.json",
-        "facilities": ["Akola", "Bah", "Barauli Ahir", "Fatehpur Sikri", "Khandauli", "Pinahat", "Saiya", "Shamsabad", "Fatehabad", "Jaitpur Kalan", "Jagner", "CHC Bichpuri", "CHC Kheragarh", "CHC Etmadpur", "Achhnera"] 
-    }
-};
-
-// Complete standard 73 baseline array metrics
-const STANDARD_TESTS = [
-    "Hemoglobin", "Total leucocyte count", "Differential leucocyte count", "Platelet count", "Complete blood count", 
-    "Erythrocyte sedimentation rate (ESR)", "Blood group and Rh typing, cross matching", "Peripheral blood film", 
-    "Reticulocyte count", "Absolute eosinophil count", "Bleeding time and clotting time", "Sickle cell screening test",
-    "Urine routine test", "Urine microscopy", "Dengue test", "HIV test", "HBsAg test", "HCV test", "Blood sugar", 
-    "Serum creatinine", "Blood urea", "SGPT", "SGOT", "HbA1c", "Serum calcium", "Troponin I", "CRP (Quantitative)"
-    // Add the remaining test titles here to match your custom form structure
-];
-
-// 1. Route based on browser URL query strings (?district=lucknow)
-const urlParams = new URLSearchParams(window.location.search);
-let districtKey = urlParams.get('district');
-
-if (!districtKey || !STATEWIDE_REGISTRY[districtKey.toLowerCase()]) {
-    districtKey = "lucknow"; // Fallback default anchor
-} else {
-    districtKey = districtKey.toLowerCase();
-}
-
-const activeDistrict = STATEWIDE_REGISTRY[districtKey];
-
-// 2. Adjust Frontend Branding Elements 
-document.getElementById('dashboard-title').innerText = `Live Lab Test Availability Portal — ${activeDistrict.name}`;
-document.getElementById('district-info').innerText = `Statewide Health Infrastructure Network // Current Operations Region: ${activeDistrict.name.toUpperCase()}`;
-
-// 3. Render Dropdown options
-const selectElement = document.getElementById('facility-select');
-activeDistrict.facilities.forEach(facility => {
-    let opt = document.createElement('option');
-    opt.value = facility;
-    opt.innerText = facility;
-    selectElement.appendChild(opt);
-});
-
-// 4. Extract data from static CDN file
-async function fetchDowntimeData() {
-    const targetFacility = selectElement.value;
-    const gridContainer = document.getElementById('test-grid');
-    const loader = document.getElementById('status-container');
-    
-    gridContainer.innerHTML = "";
-    loader.style.display = "block";
-
-    try {
-        const response = await fetch(activeDistrict.dataPath);
-        if (!response.ok) throw new Error("File not found");
-        
-        const masterJson = await response.json();
-        const facilityDowntimes = masterJson[targetFacility] || {};
-        
-        loader.style.display = "none";
-        
-        STANDARD_TESTS.forEach(test => {
-            const isDown = facilityDowntimes[test];
-            const card = document.createElement('div');
-            card.className = `card ${isDown ? 'down' : ''}`;
+    <div class="container mb-5">
+        <div class="status-card">
+            <div class="d-flex justify-content-between align-items-center flex-wrap pb-3 mb-4 border-bottom">
+                <h3 class="fw-bold m-0 text-dark" id="display-facility-name" style="font-size: 1.45rem;">Connecting...</h3>
+                <div id="display-status-badge" class="status-badge status-pending">Loading Repository Cache...</div>
+            </div>
             
-            if (isDown) {
-                card.innerHTML = `
-                    <h3 class="test-title">${test}</h3>
-                    <span class="badge down">🚨 OUT OF SERVICE</span>
-                    <div class="reason">Reason: ${facilityDowntimes[test].reasonEn}</div>
-                    <div class="reason">कारण: ${facilityDowntimes[test].reasonHi}</div>
-                `;
-            } else {
-                card.innerHTML = `
-                    <h3 class="test-title">${test}</h3>
-                    <span class="badge available">✅ WORKING FINE</span>
-                    <div class="reason" style="color:#28a745; font-weight:normal;">Fully operational metrics</div>
-                `;
+            <div id="dynamic-content-area"></div>
+        </div>
+    </div>
+
+    <script>
+        let GLOBAL_CDN_RAW_DATA = {};
+        let TARGET_DISTRICT = "lucknow"; 
+
+        const DISTRICT_FACILITY_MAPS = {
+            "lucknow": [
+                "CHC Gosaiganj", "CHC Kakori", "CHC Malihabad", "CHC Chinhat", 
+                "CHC Mohanlalganj", "CHC Bakshi Ka Talab", "CHC Mal", "CHC Sarojini Nagar"
+            ],
+            "agra": [
+                "CHC Achhnera", "CHC Fatehabad", "CHC Jagner", "CHC Pinahat"
+            ]
+        };
+
+        const DEPARTMENT_MASTER_CATALOG = {
+            "Hematology & Blood Studies / रक्त विज्ञान": [
+                "Hemoglobin", "Total leucocyte count", "Differential leucocyte count", "Platelet count", "Complete blood count", "Erythrocyte sedimentation rate (ESR)", "Blood group and Rh typing, cross matching", "Peripheral blood film", "Reticulocyte count", "Absolute eosinophil count", "Bleeding time and clotting time", "Sickle cell screening test", "Sickle cell strip test", "Thalassemia screening", "DCT for Hb electrophoresis", "G6PD enzyme deficiency test", "MP slide method", "Malaria rapid test", "Prothrombin Time (PT) and INR", "Activated partial thromboplastin time (APTT)"
+            ],
+            "Clinical Pathology (Urine & Stool) / मूत्र एवं मल जांच": [
+                "HCG urine test", "Urine routine test", "Urine microscopy", "Urine for microalbumin", "Urine for creatinine and ACR", "Stool for ova and cyst", "Stool for occult blood"
+            ],
+            "Serology & Microbiology / सीरम विज्ञान और सूक्ष्म जीव विज्ञान": [
+                "Dengue test", "RPR/VDRL test", "HIV test", "HBsAg test", "HCV test", "Sputum for AFB", "Typhoid test (IgM)", "Wet mount & Gram stain", "Gram staining", "VIA test", "K39 for Kala Azar", "Filaria test", "TB Mantoux", "Rapid test for cholera", "CBNAAT"
+            ],
+            "Biochemistry / जैव रसायन": [
+                "Blood sugar", "Glucose tolerance test (GTT)", "Total bilirubin", "Direct & indirect bilirubin", "Serum creatinine", "Blood urea", "SGPT", "SGOT", "Alkaline phosphatase", "Total protein", "Albumin & A/G ratio", "Globulin", "Total cholesterol", "Triglycerides", "VLDL", "HDL", "LDL", "Uric acid", "HbA1c", "Serum calcium", "Amylase", "Iron", "TIBC", "LDH", "24 hr urinary protein"
+            ],
+            "Specialized Diagnostics & Fluids / विशिष्ट जांच": [
+                "Troponin I", "CRP (Quantitative)", "Pap smear", "CSF analysis", "Fluid analysis", "Drug overdose test"
+            ]
+        };
+
+        const ABBREVIATION_MAP = {
+            "tlc": "total leucocyte count", "dlc": "differential leucocyte count", "hb": "hemoglobin", "cbc": "complete blood count",
+            "esr": "erythrocyte sedimentation rate (esr)", "pbf": "peripheral blood film", "aec": "absolute eosinophil count",
+            "bt": "bleeding time and clotting time", "ct": "bleeding time and clotting time", "mp": "mp slide method",
+            "pt": "prothrombin time (pt) and inr", "inr": "prothrombin time (pt) and inr", "aptt": "activated partial thromboplastin time (aptt)",
+            "hcg": "hcg urine test", "acr": "urine for creatinine and acr", "afb": "sputum for afb", "via": "via test",
+            "gtt": "glucose tolerance test (gtt)", "sgpt": "sgpt", "sgot": "sgot", "vldl": "vldl", "hdl": "hdl", "ldl": "ldl",
+            "hba1c": "hba1c", "tibc": "tibc", "ldh": "ldh", "crp": "crp (quantitative)"
+        };
+
+        document.addEventListener("DOMContentLoaded", function() {
+            displayCurrentDate();
+            parseDistrictRoute();
+            buildFacilityDropdown();
+            fetchDistrictJsonData();
+        });
+
+        function displayCurrentDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const today = new Date();
+            document.getElementById("current-date-badge").innerText = today.toLocaleDateString('en-US', options);
+        }
+
+        function parseDistrictRoute() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const distParam = urlParams.get('district');
+            if (distParam) {
+                TARGET_DISTRICT = distParam.toLowerCase().trim();
             }
-            gridContainer.appendChild(card);
-        });
+            document.getElementById("title-district-name").innerText = TARGET_DISTRICT.charAt(0).toUpperCase() + TARGET_DISTRICT.slice(1);
+        }
 
-    } catch (error) {
-        // Safe UX fallback if a brand new folder has not received its first submission file yet
-        loader.style.display = "none";
-        STANDARD_TESTS.forEach(test => {
-            const card = document.createElement('div');
-            card.className = "card";
-            card.innerHTML = `
-                <h3 class="test-title">${test}</h3>
-                <span class="badge available">✅ WORKING FINE</span>
-                <div class="reason" style="color:#28a745; font-weight:normal;">Fully operational metrics</div>
-            `;
-            gridContainer.appendChild(card);
-        });
-    }
-}
+        function buildFacilityDropdown() {
+            const selector = document.getElementById("facility-selector");
+            selector.innerHTML = "";
+            const facilityList = DISTRICT_FACILITY_MAPS[TARGET_DISTRICT] || DISTRICT_FACILITY_MAPS["lucknow"];
+            
+            facilityList.forEach(fac => {
+                let option = document.createElement("option");
+                option.value = fac;
+                option.innerText = `${fac} / चिकित्सा इकाई`;
+                selector.appendChild(option);
+            });
+        }
 
-// Kickoff processing engine immediately on screen load
-fetchDowntimeData();
-</script>
+        function fetchDistrictJsonData() {
+            const targetJsonPath = `./${TARGET_DISTRICT}/Data.json`;
+
+            fetch(targetJsonPath, { cache: "no-store" })
+                .then(response => {
+                    if (!response.ok) throw new Error("File not found");
+                    return response.json();
+                })
+                .then(data => {
+                    // Convert all JSON facility keys to lowercase to bypass spacing or capitalization mismatch
+                    GLOBAL_CDN_RAW_DATA = {};
+                    for (let key in data) {
+                        GLOBAL_CDN_RAW_DATA[key.toLowerCase().trim()] = data[key];
+                    }
+                    renderActiveFacilityData();
+                })
+                .catch(error => {
+                    document.getElementById("display-status-badge").className = "status-badge status-pending";
+                    document.getElementById("display-status-badge").innerText = "Awaiting Submissions";
+                    document.getElementById("dynamic-content-area").innerHTML = `
+                        <div class="alert alert-warning text-center border-0 py-5 shadow-sm" style="border-radius: 16px;">
+                            <h4 class="fw-bold mb-2">⚠️ Daily Tracking Logs Unavailable</h4>
+                            <p class="mb-0 text-secondary fw-medium">No active data parsed for <strong>${TARGET_DISTRICT}</strong> yet.</p>
+                        </div>`;
+                });
+        }
+
+        function renderActiveFacilityData() {
+            const selector = document.getElementById("facility-selector");
+            const activeFacility = selector.value;
+            document.getElementById("display-facility-name").innerText = activeFacility;
+            
+            const badge = document.getElementById("display-status-badge");
+            const contentArea = document.getElementById("dynamic-content-area");
+            document.getElementById("search-bar").value = "";
+
+            // Safely look up matching key using lowercase
+            const facilityExceptions = GLOBAL_CDN_RAW_DATA[activeFacility.toLowerCase().trim()] || null;
+
+            let totalExceptions = 0;
+            if (facilityExceptions && facilityExceptions !== "UPDATED" && typeof facilityExceptions === 'object') {
+                // If it's an exception object, count the inactive tests
+                totalExceptions = Object.keys(facilityExceptions).filter(k => k !== "systemStatus").length;
+            }
+            
+            const operationalCount = 73 - totalExceptions;
+
+            if (totalExceptions === 0) {
+                badge.className = "status-badge status-updated";
+                badge.innerText = "All Tests Active / सभी जांच उपलब्ध";
+            } else {
+                badge.className = "status-badge status-error";
+                badge.innerText = `${totalExceptions} Tests Inactive / जांच बाधित`;
+            }
+
+            let renderHTML = `
+                <div class="p-3 mb-4 counter-banner d-flex justify-content-center align-items-center gap-3 flex-wrap">
+                    <div class="counter-pill text-success">🟢 Active / उपलब्ध: <span id="count-active">${operationalCount}</span></div>
+                    <div class="counter-pill text-danger">⚠️ Inactive / बाधित: <span id="count-inactive">${totalExceptions}</span></div>
+                </div>
+                <div id="grid-catalog-container">`;
+
+            for (const [deptName, testList] of Object.entries(DEPARTMENT_MASTER_CATALOG)) {
+                renderHTML += `
+                    <div class="dept-wrapper-block">
+                        <div class="dept-section-title">${deptName}</div>
+                        <div class="row g-3">`;
+
+                testList.forEach((test) => {
+                    // Match test names accurately case-insensitive
+                    let isDown = null;
+                    if (facilityExceptions && typeof facilityExceptions === 'object') {
+                        // Find if test exists inside down items case-insensitively
+                        const matchKey = Object.keys(facilityExceptions).find(k => k.toLowerCase().trim() === test.toLowerCase().trim());
+                        if (matchKey) isDown = facilityExceptions[matchKey];
+                    }
+
+                    const cardStatusClass = isDown ? "test-card-inactive" : "test-card-active";
+                    const statusBadge = isDown ? 
+                        `<div class="pill-status pill-unavailable">
+                            <span>NOT AVAILABLE</span>
+                            <span style="font-size: 0.7rem; opacity: 0.85;">अनुपलब्ध</span>
+                         </div>` : 
+                        `<div class="pill-status pill-available">
+                            <span>AVAILABLE</span>
+                            <span style="font-size: 0.7rem; opacity: 0.85;">उपलब्ध</span>
+                         </div>`;
+
+                    let reasonContent = "";
+                    if (isDown) {
+                        reasonContent = `
+                            <div class="reason-subtext-container">
+                                <span class="reason-en">Reason: ${isDown.reasonEn || 'Breakdown'}</span>
+                                <span class="reason-hi">कारण: ${isDown.reasonHi || 'तकनीकी खराबी'}</span>
+                            </div>`;
+                    }
+
+                    renderHTML += `
+                        <div class="col-12 search-row-target">
+                            <div class="test-card-item ${cardStatusClass}">
+                                <div class="test-card-left">
+                                    <div class="test-card-title search-target-name">${test}</div>
+                                    ${reasonContent}
+                                </div>
+                                <div class="test-card-right">
+                                    ${statusBadge}
+                                </div>
+                            </div>
+                        </div>`;
+                });
+                renderHTML += `</div></div>`;
+            }
+            renderHTML += `</div>`;
+            contentArea.innerHTML = renderHTML;
+        }
+
+        function filterTestTable() {
+            let query = document.getElementById("search-bar").value.toLowerCase().trim();
+            if (ABBREVIATION_MAP[query]) {
+                query = ABBREVIATION_MAP[query];
+            }
+            
+            const sections = document.getElementsByClassName("dept-wrapper-block");
+
+            for (let i = 0; i < sections.length; i++) {
+                const cards = sections[i].getElementsByClassName("search-row-target");
+                let visibleCardsInSection = 0;
+
+                for (let j = 0; j < cards.length; j++) {
+                    const nameField = cards[j].querySelector(".search-target-name");
+                    if (nameField) {
+                        const textValue = (nameField.textContent || nameField.innerText).toLowerCase();
+                        if (textValue.indexOf(query) > -1) {
+                            // Using standard display styling to prevent search breakage
+                            cards[j].style.display = "block";
+                            visibleCardsInSection++;
+                        } else {
+                            cards[j].style.display = "none";
+                        }
+                    }
+                }
+
+                sections[i].style.display = (visibleCardsInSection > 0 || query === "") ? "block" : "none";
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
