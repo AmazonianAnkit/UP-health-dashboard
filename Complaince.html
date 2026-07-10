@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statewide District Compliance Tracker - UP Health</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f7f6; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #2d3748; }
+        .header-banner { background: linear-gradient(135deg, #1a202c, #4a5568); color: white; padding: 2rem 1rem; border-bottom: 4px solid #3182ce; }
+        .metric-card { background: white; border-radius: 16px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.03); padding: 1.5rem; text-align: center; }
+        .metric-num { font-size: 2.5rem; font-weight: 800; }
+        .compliance-card { background: white; border: 1px solid #e2e8f0; border-radius: 16px; margin-bottom: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.02); overflow: hidden; }
+        .card-header-compliant { background-color: #f0fff4; border-bottom: 1px solid #c6f6d5; padding: 1rem 1.5rem; }
+        .card-header-noncompliant { background-color: #fff5f5; border-bottom: 1px solid #fed7d7; padding: 1rem 1.5rem; }
+        .facility-tag { display: inline-block; background-color: #fff5f5; color: #c53030; border: 1px solid #feb2b2; padding: 0.35rem 0.75rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; margin: 0.25rem; }
+    </style>
+</head>
+<body>
+
+    <div class="header-banner text-center mb-4">
+        <div class="container">
+            <h1 class="fw-bold">उत्तर प्रदेश स्वास्थ्य विभाग</h1>
+            <p class="lead mb-0">Statewide Daily BPHU Submission Compliance Monitor</p>
+        </div>
+    </div>
+
+    <div class="container mb-4">
+        <!-- Live Global Metrics Row -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="metric-card">
+                    <div class="text-secondary small fw-bold text-uppercase">Total Districts</div>
+                    <div class="metric-num text-dark" id="metric-total">0</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="metric-card">
+                    <div class="text-secondary small fw-bold text-uppercase">100% Compliant</div>
+                    <div class="metric-num text-success" id="metric-compliant">0</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="metric-card">
+                    <div class="text-secondary small fw-bold text-uppercase">Action Required</div>
+                    <div class="metric-num text-danger" id="metric-pending">0</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="metric-card">
+                    <div class="text-secondary small fw-bold text-uppercase">State Rate</div>
+                    <div class="metric-num text-primary" id="metric-rate">0%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Bar Filters -->
+        <div class="card p-3 border-0 shadow-sm mb-4" style="border-radius: 12px;">
+            <div class="row g-2 align-items-center">
+                <div class="col-12 col-md-8">
+                    <input type="text" id="compliance-search" class="form-control" placeholder="Filter by District Name..." oninput="filterComplianceTracker()">
+                </div>
+                <div class="col-12 col-md-4">
+                    <select id="compliance-filter" class="form-select" onchange="filterComplianceTracker()">
+                        <option value="all">Show All Districts</option>
+                        <option value="pending">Show Only Defaulters (Action Required)</option>
+                        <option value="compliant">Show Only Fully Compliant</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Ledger Target Panel -->
+        <div id="compliance-ledger-root">
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2 text-secondary fw-medium">Auditing statewide repository nodes, please wait...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Centralized Master Directory Mapping (Add clean slug mappings as you scale out to 75)
+        const MASTER_DISTRICT_REGISTRY = {
+            "lucknow": { name: "Lucknow", totalFacilities: 8 },
+            "agra": { name: "Agra", totalFacilities: 15 },
+            "aligarh": { name: "Aligarh", totalFacilities: 12 },
+            "ambedkarnagar": { name: "Ambedkar Nagar", totalFacilities: 9 }
+        };
+
+        let metrics = { total: 0, compliant: 0, pending: 0 };
+
+        async function auditStatewideCompliance() {
+            const root = document.getElementById("compliance-ledger-root");
+            let ledgerHTML = "";
+            
+            metrics.total = Object.keys(MASTER_DISTRICT_REGISTRY).length;
+            metrics.compliant = 0;
+            metrics.pending = 0;
+
+            for (const [slug, meta] of Object.entries(MASTER_DISTRICT_REGISTRY)) {
+                let nonCompliantFacilities = [];
+                let isDistrictCompletelyPending = false;
+
+                try {
+                    const response = await fetch(`./${slug}/Data.json`, { cache: "no-store" });
+                    if (!response.ok) throw new Error("Unpublished");
+                    
+                    const data = await response.json();
+                    
+                    // Standardize keys to lowercase for clean matching
+                    let processedData = {};
+                    for (let k in data) { processedData[k.toLowerCase().trim()] = data[k]; }
+
+                    // Loop through expected facilities and check status
+                    // Note: This relies on individual facility IDs being mapped dynamically.
+                    // For the dashboard validation engine, if the file is up but specific keys are PENDING:
+                    let activeSubmissions = 0;
+                    
+                    for (let key in processedData) {
+                        if (processedData[key] === "PENDING" || processedData[key].systemStatus === "PENDING") {
+                            nonCompliantFacilities.push(key.toUpperCase());
+                        } else {
+                            activeSubmissions++;
+                        }
+                    }
+
+                    // Handle edge cases where data file exists but has no active rows yet
+                    if (activeSubmissions === 0 && Object.keys(processedData).length === 0) {
+                        isDistrictCompletelyPending = true;
+                    }
+
+                } catch (err) {
+                    isDistrictCompletelyPending = true;
+                }
+
+                let statusClass = "";
+                let headerClass = "";
+                let statusBadge = "";
+                let bodyContent = "";
+
+                if (isDistrictCompletelyPending || nonCompliantFacilities.length > 0) {
+                    metrics.pending++;
+                    statusClass = "status-block-pending";
+                    headerClass = "card-header-noncompliant";
+                    statusBadge = `<span class="badge bg-danger px-3 py-2">⚠️ ACTION REQUIRED</span>`;
+                    
+                    if (isDistrictCompletelyPending) {
+                        bodyContent = `<div class="p-3 text-danger fw-medium small">❌ Zero communication logs received today. Entire district is pending.</div>`;
+                    } else {
+                        bodyContent = `
+                            <div class="p-3">
+                                <div class="text-secondary small fw-bold text-uppercase mb-2">Defaulter Facilities (${nonCompliantFacilities.length}):</div>
+                                <div>${nonCompliantFacilities.map(f => `<span class="facility-tag">${f}</span>`).join('')}</div>
+                            </div>`;
+                    }
+                } else {
+                    metrics.compliant++;
+                    statusClass = "status-block-compliant";
+                    headerClass = "card-header-compliant";
+                    statusBadge = `<span class="badge bg-success px-3 py-2">🟢 100% COMPLIANT</span>`;
+                    bodyContent = `<div class="p-3 text-success fw-medium small">✓ All laboratory data packets transmitted successfully for today.</div>`;
+                }
+
+                ledgerHTML += `
+                    <div class="compliance-card ${statusClass}" data-name="${meta.name.toLowerCase()}">
+                        <div class="${headerClass} d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <h4 class="fw-bold m-0 text-dark" style="font-size: 1.15rem;">${meta.name}</h4>
+                                <small class="text-muted fw-semibold">Target Units: ${meta.totalFacilities}</small>
+                            </div>
+                            <div>${statusBadge}</div>
+                        </div>
+                        ${bodyContent}
+                    </div>`;
+            }
+
+            root.innerHTML = ledgerHTML;
+            updateMetricsDisplay();
+        }
+
+        function updateMetricsDisplay() {
+            document.getElementById("metric-total").innerText = metrics.total;
+            document.getElementById("metric-compliant").innerText = metrics.compliant;
+            document.getElementById("metric-pending").innerText = metrics.pending;
+            
+            const rate = metrics.total > 0 ? Math.round((metrics.compliant / metrics.total) * 100) : 0;
+            document.getElementById("metric-rate").innerText = `${rate}%`;
+        }
+
+        function filterComplianceTracker() {
+            const searchVal = document.getElementById("compliance-search").value.toLowerCase().trim();
+            const filterVal = document.getElementById("compliance-filter").value;
+            const cards = document.getElementsByClassName("compliance-card");
+
+            for (let i = 0; i < cards.length; i++) {
+                const cardName = cards[i].getAttribute("data-name");
+                const isCompliant = cards[i].classList.contains("status-block-compliant");
+                
+                let matchesSearch = cardName.indexOf(searchVal) > -1;
+                let matchesFilter = true;
+
+                if (filterVal === "pending" && isCompliant) matchesFilter = false;
+                if (filterVal === "compliant" && !isCompliant) matchesFilter = false;
+
+                cards[i].style.display = (matchesSearch && matchesFilter) ? "block" : "none";
+            }
+        }
+
+        // Kick off calculations right on load
+        document.addEventListener("DOMContentLoaded", auditStatewideCompliance);
+    </script>
+</body>
+</html>
