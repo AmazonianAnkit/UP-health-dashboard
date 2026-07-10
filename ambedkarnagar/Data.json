@@ -142,5 +142,91 @@
       "reasonEn": "Reagent Out of Stock",
       "reasonHi": "अभिकर्मक अनुपलब्ध"
     }
+  },
+  "Jalalpur": {
+    "Hemoglobin": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Reagent Out of Stock",
+      "reasonHi": "अभिकर्मक अनुपलब्ध"
+    },
+    "Total leucocyte count": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
+    },
+    "Differential leucocyte count": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Both Reasons",
+      "reasonHi": "उपरोक्त दोनों कारण"
+    },
+    "HCG urine test": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Reagent Out of Stock",
+      "reasonHi": "अभिकर्मक अनुपलब्ध"
+    },
+    "Urine routine test": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Reagent Out of Stock",
+      "reasonHi": "अभिकर्मक अनुपलब्ध"
+    },
+    "Urine microscopy": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
+    },
+    "Dengue test": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Both Reasons",
+      "reasonHi": "उपरोक्त दोनों कारण"
+    },
+    "RPR/VDRL test": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Both Reasons",
+      "reasonHi": "उपरोक्त दोनों कारण"
+    },
+    "HIV test": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
+    },
+    "Blood sugar": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Both Reasons",
+      "reasonHi": "उपरोक्त दोनों कारण"
+    },
+    "Glucose tolerance test (GTT)": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
+    },
+    "Total bilirubin": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
+    },
+    "CSF analysis": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Both Reasons",
+      "reasonHi": "उपरोक्त दोनों कारण"
+    },
+    "Fluid analysis": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Both Reasons",
+      "reasonHi": "उपरोक्त दोनों कारण"
+    }
   }
 }
