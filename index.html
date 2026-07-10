@@ -7,52 +7,33 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background-color: #f6f8fb; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #2d3748; }
-        
-        /* Premium Header Styling */
         .dashboard-header { background: linear-gradient(135deg, #1a365d, #2b6cb0); color: white; padding: 2.5rem 1rem; box-shadow: 0 4px 20px rgba(26, 54, 93, 0.15); border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; }
         .dashboard-header h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; }
         .dashboard-header .lead { font-size: 1.05rem; opacity: 0.85; font-weight: 500; }
-        
-        /* Modern Floating Control Deck */
         .control-card { background: white; border: none; border-radius: 20px; box-shadow: 0 12px 30px rgba(0,0,0,0.04); padding: 1.75rem; margin-top: -2.5rem; margin-bottom: 2.5rem; border: 1px solid rgba(255,255,255,0.8); }
         .control-card label { font-size: 0.85rem; font-weight: 700; color: #4a5568; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.6rem; }
         .form-select, .form-control { border-radius: 12px; border: 1.5px solid #e2e8f0; font-size: 1rem; transition: all 0.2s ease; }
         .form-select:focus, .form-control:focus { border-color: #3182ce; box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15); }
-        
-        /* Main Analytics Sheet */
         .status-card { background: white; border: none; border-radius: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.03); padding: 2rem; }
         .status-badge { font-size: 0.85rem; padding: 0.6rem 1.2rem; border-radius: 50px; font-weight: 700; display: inline-block; letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
         .status-updated { background-color: #e6fffa; color: #00684a; border: 1px solid #b2f5ea; }
         .status-pending { background-color: #fffaf0; color: #dd6b20; border: 1px solid #feebc8; animation: pulse 2s infinite; }
         .status-error { background-color: #fff5f5; color: #e53e3e; border: 1px solid #fed7d7; }
-        
-        /* Glassmorphic Stats Track Counters */
         .counter-banner { background: #f7fafc; border-radius: 16px; border: 1px solid #edf2f7; padding: 1.25rem !important; }
         .counter-pill { background: white; padding: 0.6rem 1.2rem; border-radius: 12px; font-weight: 700; font-size: 0.95rem; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 8px; border: 1px solid #edf2f7; }
-        
-        /* Native App Style Diagnostics Cards Group */
         .dept-section-title { font-size: 1.25rem; font-weight: 800; color: #2b6cb0; margin: 2rem 0 1rem 0; padding-bottom: 0.4rem; border-bottom: 2px solid #edf2f7; }
-        
         .test-card-item { background: white; border: 1px solid #edf2f7; border-radius: 16px; padding: 1.25rem; box-shadow: 0 4px 12px rgba(0,0,0,0.01); display: flex; align-items: center; justify-content: space-between; transition: all 0.2s ease; gap: 1rem; }
         .test-card-active { background-color: #ffffff; border-left: 5px solid #48bb78; }
         .test-card-inactive { background-color: #fffafb; border: 1px solid #fed7d7; border-left: 5px solid #e53e3e; }
-        
         .test-card-left { flex: 1; display: flex; flex-direction: column; }
         .test-card-title { font-size: 1.1rem; font-weight: 700; color: #1a202c; line-height: 1.3; margin: 0; }
-        
-        /* Badges Formatting */
         .pill-status { font-size: 0.8rem; font-weight: 800; padding: 0.45rem 1rem; border-radius: 10px; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; line-height: 1.2; min-width: 130px; flex-shrink: 0; }
         .pill-available { background: linear-gradient(135deg, #48bb78, #38a169); color: white; }
         .pill-unavailable { background: linear-gradient(135deg, #f56565, #e53e3e); color: white; }
-        
-        /* Sub-text Error Reasons Layout styling */
         .reason-subtext-container { margin-top: 0.4rem; display: block; }
         .reason-en { font-size: 0.9rem; color: #800000; font-weight: 700; display: inline-block; margin-right: 0.5rem; }
         .reason-hi { font-size: 0.85rem; color: #800000; font-weight: 600; display: inline-block; }
-
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
-
-        /* Mobile Adjustments */
         @media screen and (max-width: 480px) {
             .test-card-item { padding: 1rem; }
             .test-card-title { font-size: 1rem; }
@@ -78,8 +59,7 @@
                 <div class="col-12 col-md-6">
                     <label class="form-label">Select Laboratory Facility / प्रयोगशाला इकाई का चयन करें</label>
                     <select class="form-select form-select-lg py-2" id="facility-selector" onchange="renderActiveFacilityData()">
-                        <!-- Dynamic options loaded via router -->
-                    </select>
+                        </select>
                 </div>
                 <div class="col-12 col-md-6">
                     <label class="form-label">Search Diagnostic Test / जांच का नाम खोजें</label>
@@ -95,7 +75,6 @@
                 <h3 class="fw-bold m-0 text-dark" id="display-facility-name" style="font-size: 1.45rem;">Connecting...</h3>
                 <div id="display-status-badge" class="status-badge status-pending">Loading Repository Cache...</div>
             </div>
-            
             <div id="dynamic-content-area"></div>
         </div>
     </div>
@@ -104,7 +83,6 @@
         let GLOBAL_CDN_RAW_DATA = {};
         let TARGET_DISTRICT = "lucknow"; 
 
-        // Facilities configured with explicit bilingual matching arrays [EnglishKey, English/Hindi Display]
         const DISTRICT_FACILITY_MAPS = {
             "lucknow": [
                 { id: "CHC Gosaiganj", display: "CHC Gosaiganj / सी.एच.सी. गोसाईगंज" },
@@ -118,20 +96,20 @@
             ],
             "agra": [
                 { id: "Achhnera", display: "CHC Achhnera / सी.एच.सी. अछनेरा" },
-    { id: "Akola", display: "CHC Akola / सी.एच.सी. अकोला" },
-    { id: "Bah", display: "CHC Bah / सी.एच.सी. बाह" },
-    { id: "Barauli Ahir", display: "CHC Barauli Ahir / सी.एच.सी. बरौली अहीर" },
-    { id: "CHC Bichpuri", display: "CHC Bichpuri / सी.एच.सी. बिचपुरी" },
-    { id: "CHC Etmadpur", display: "CHC Etmadpur / सी.एच.सी. एतमादपुर" },
-    { id: "Fatehabad", display: "CHC Fatehabad / सी.एच.सी. फतेहाबाद" },
-    { id: "Fatehpur Sikri", display: "CHC Fatehpur Sikri / सी.एच.सी. फतेहपुर सीकरी" },
-    { id: "Jagner", display: "CHC Jagner / सी.एच.सी. जगनेर" },
-    { id: "Jaitpur Kalan", display: "CHC Jaitpur Kalan / सी.एच.सी. जैतपुर कलां" },
-    { id: "Khandauli", display: "CHC Khandauli / सी.एच.सी. खन्दौली" },
-    { id: "CHC Kheragarh", display: "CHC Kheragarh / सी.एच.सी. खेरागढ़" },
-    { id: "Pinahat", display: "CHC Pinahat / सी.एच.सी. पिनाहट" },
-    { id: "Saiya", display: "CHC Saiya / सी.एच.सी. सैंया" },
-    { id: "Shamsabad", display: "CHC Shamsabad / सी.एच.सी. शमसाबाद" }
+                { id: "Akola", display: "CHC Akola / सी.एच.सी. अकोला" },
+                { id: "Bah", display: "CHC Bah / सी.एच.सी. बाह" },
+                { id: "Barauli Ahir", display: "CHC Barauli Ahir / सी.एच.सी. बरौली अहीर" },
+                { id: "CHC Bichpuri", display: "CHC Bichpuri / सी.एच.सी. बिचपुरी" },
+                { id: "CHC Etmadpur", display: "CHC Etmadpur / सी.एच.सी. एतमादपुर" },
+                { id: "Fatehabad", display: "CHC Fatehabad / सी.एच.सी. फतेहाबाद" },
+                { id: "Fatehpur Sikri", display: "CHC Fatehpur Sikri / सी.एच.सी. फतेहपुर सीकरी" },
+                { id: "Jagner", display: "CHC Jagner / सी.एच.सी. जगनेर" },
+                { id: "Jaitpur Kalan", display: "CHC Jaitpur Kalan / सी.एच.सी. जैतपुर कलां" },
+                { id: "Khandauli", display: "CHC Khandauli / सी.एच.सी. खन्दौली" },
+                { id: "CHC Kheragarh", display: "CHC Kheragarh / सी.एच.सी. खेरागढ़" },
+                { id: "Pinahat", display: "CHC Pinahat / सी.एच.सी. पिनाहट" },
+                { id: "Saiya", display: "CHC Saiya / सी.एच.सी. सैंया" },
+                { id: "Shamsabad", display: "CHC Shamsabad / सी.एच.सी. शमसाबाद" }
             ]
         };
 
@@ -176,22 +154,14 @@
             document.getElementById("current-date-badge").innerText = today.toLocaleDateString('en-US', options);
         }
 
-       function parseDistrictRoute() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const distParam = urlParams.get('district');
-    if (distParam) {
-        TARGET_DISTRICT = distParam.toLowerCase().trim();
-    }
-    
-    // Capitalize the first letter for display (e.g., agra -> Agra)
-    const formattedDistrictName = TARGET_DISTRICT.charAt(0).toUpperCase() + TARGET_DISTRICT.slice(1);
-    
-    // This updates the sub-title next to "Live Laboratory Test Availability..."
-    const titleElement = document.getElementById("title-district-name");
-    if (titleElement) {
-        titleElement.innerText = formattedDistrictName;
-    }
-}
+        function parseDistrictRoute() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const distParam = urlParams.get('district');
+            if (distParam) {
+                TARGET_DISTRICT = distParam.toLowerCase().trim();
+            }
+            document.getElementById("title-district-name").innerText = TARGET_DISTRICT.charAt(0).toUpperCase() + TARGET_DISTRICT.slice(1);
+        }
 
         function buildFacilityDropdown() {
             const selector = document.getElementById("facility-selector");
@@ -200,8 +170,8 @@
             
             facilityList.forEach(fac => {
                 let option = document.createElement("option");
-                option.value = fac.id; // Looks up backend file using pristine ID key
-                option.innerText = fac.display; // Renders bilingual English & Hindi selection name
+                option.value = fac.id;
+                option.innerText = fac.display;
                 selector.appendChild(option);
             });
         }
@@ -239,7 +209,6 @@
             const activeFacilityDisplay = selector.options[selector.selectedIndex].text;
             
             document.getElementById("display-facility-name").innerText = activeFacilityDisplay;
-            
             const badge = document.getElementById("display-status-badge");
             const contentArea = document.getElementById("dynamic-content-area");
             document.getElementById("search-bar").value = "";
@@ -329,16 +298,11 @@
 
         function filterTestTable() {
             let query = document.getElementById("search-bar").value.toLowerCase().trim();
-            if (ABBREVIATION_MAP[query]) {
-                query = ABBREVIATION_MAP[query];
-            }
-            
+            if (ABBREVIATION_MAP[query]) { query = ABBREVIATION_MAP[query]; }
             const sections = document.getElementsByClassName("dept-wrapper-block");
-
             for (let i = 0; i < sections.length; i++) {
                 const cards = sections[i].getElementsByClassName("search-row-target");
                 let visibleCardsInSection = 0;
-
                 for (let j = 0; j < cards.length; j++) {
                     const nameField = cards[j].querySelector(".search-target-name");
                     if (nameField) {
