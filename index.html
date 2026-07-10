@@ -78,7 +78,7 @@
                 <div class="col-12 col-md-6">
                     <label class="form-label">Select Laboratory Facility / प्रयोगशाला इकाई का चयन करें</label>
                     <select class="form-select form-select-lg py-2" id="facility-selector" onchange="renderActiveFacilityData()">
-                        <!-- Dynamic options -->
+                        <!-- Dynamic options loaded via router -->
                     </select>
                 </div>
                 <div class="col-12 col-md-6">
@@ -104,14 +104,34 @@
         let GLOBAL_CDN_RAW_DATA = {};
         let TARGET_DISTRICT = "lucknow"; 
 
+        // Facilities configured with explicit bilingual matching arrays [EnglishKey, English/Hindi Display]
         const DISTRICT_FACILITY_MAPS = {
             "lucknow": [
-                "CHC Gosaiganj", "CHC Kakori", "CHC Malihabad", "CHC Chinhat", 
-                "CHC Mohanlalganj", "CHC Bakshi Ka Talab", "CHC Mal", "CHC Sarojini Nagar"
+                { id: "CHC Gosaiganj", display: "CHC Gosaiganj / सी.एच.सी. गोसाईगंज" },
+                { id: "CHC Kakori", display: "CHC Kakori / सी.एच.सी. काकोरी" },
+                { id: "CHC Malihabad", display: "CHC Malihabad / सी.एच.सी. मलिहाबाद" },
+                { id: "CHC Chinhat", display: "CHC Chinhat / सी.एच.सी. चिनहट" },
+                { id: "CHC Mohanlalganj", display: "CHC Mohanlalganj / सी.एच.सी. मोहनलालगंज" },
+                { id: "CHC Bakshi Ka Talab", display: "CHC Bakshi Ka Talab / सी.एच.सी. बख्शी का तालाब" },
+                { id: "CHC Mal", display: "CHC Mal / सी.एच.सी. माल" },
+                { id: "CHC Sarojini Nagar", display: "CHC Sarojini Nagar / सी.एच.सी. सरोजनी नगर" }
             ],
             "agra": [
-                "Akola", "Bah", "Barauli Ahir", "Fatehpur Sikri", "Khandauli", "Pinahat", "Saiya", 
-                "Shamsabad", "Fatehabad", "Jaitpur Kalan", "Jagner", "CHC Bichpuri", "CHC Kheragarh", "CHC Etmadpur", "Achhnera"
+                { id: "Achhnera", display: "CHC Achhnera / सी.एच.सी. अछनेरा" },
+    { id: "Akola", display: "CHC Akola / सी.एच.सी. अकोला" },
+    { id: "Bah", display: "CHC Bah / सी.एच.सी. बाह" },
+    { id: "Barauli Ahir", display: "CHC Barauli Ahir / सी.एच.सी. बरौली अहीर" },
+    { id: "CHC Bichpuri", display: "CHC Bichpuri / सी.एच.सी. बिचपुरी" },
+    { id: "CHC Etmadpur", display: "CHC Etmadpur / सी.एच.सी. एतमादपुर" },
+    { id: "Fatehabad", display: "CHC Fatehabad / सी.एच.सी. फतेहाबाद" },
+    { id: "Fatehpur Sikri", display: "CHC Fatehpur Sikri / सी.एच.सी. फतेहपुर सीकरी" },
+    { id: "Jagner", display: "CHC Jagner / सी.एच.सी. जगनेर" },
+    { id: "Jaitpur Kalan", display: "CHC Jaitpur Kalan / सी.एच.सी. जैतपुर कलां" },
+    { id: "Khandauli", display: "CHC Khandauli / सी.एच.सी. खन्दौली" },
+    { id: "CHC Kheragarh", display: "CHC Kheragarh / सी.एच.सी. खेरागढ़" },
+    { id: "Pinahat", display: "CHC Pinahat / सी.एच.सी. पिनाहट" },
+    { id: "Saiya", display: "CHC Saiya / सी.एच.सी. सैंया" },
+    { id: "Shamsabad", display: "CHC Shamsabad / सी.एच.सी. शमसाबाद" }
             ]
         };
 
@@ -172,8 +192,8 @@
             
             facilityList.forEach(fac => {
                 let option = document.createElement("option");
-                option.value = fac;
-                option.innerText = `${fac} / चिकित्सा इकाई`;
+                option.value = fac.id; // Looks up backend file using pristine ID key
+                option.innerText = fac.display; // Renders bilingual English & Hindi selection name
                 selector.appendChild(option);
             });
         }
@@ -183,11 +203,10 @@
 
             fetch(targetJsonPath, { cache: "no-store" })
                 .then(response => {
-                    if (!response.ok) throw new Error("File not found");
+                    if (!response.ok) throw new Error("File missing");
                     return response.json();
                 })
                 .then(data => {
-                    // Convert all JSON facility keys to lowercase to bypass spacing or capitalization mismatch
                     GLOBAL_CDN_RAW_DATA = {};
                     for (let key in data) {
                         GLOBAL_CDN_RAW_DATA[key.toLowerCase().trim()] = data[key];
@@ -196,33 +215,43 @@
                 })
                 .catch(error => {
                     document.getElementById("display-status-badge").className = "status-badge status-pending";
-                    document.getElementById("display-status-badge").innerText = "Awaiting Submissions";
+                    document.getElementById("display-status-badge").innerText = "Updation in Progress / अपडेशन प्रक्रिया में";
                     document.getElementById("dynamic-content-area").innerHTML = `
                         <div class="alert alert-warning text-center border-0 py-5 shadow-sm" style="border-radius: 16px;">
-                            <h4 class="fw-bold mb-2">⚠️ Daily Tracking Logs Unavailable</h4>
-                            <p class="mb-0 text-secondary fw-medium">No active data parsed for <strong>${TARGET_DISTRICT}</strong> yet.</p>
+                            <h4 class="fw-bold mb-2">⚠️ Updation In Progress / अपडेशन प्रक्रिया में</h4>
+                            <p class="mb-2 text-secondary fw-medium">Daily tracking logs haven't been compiled for <strong>${TARGET_DISTRICT}</strong> district yet.</p>
+                            <p class="mb-0 text-secondary fw-medium" style="font-size: 0.95rem;">इस जनपद के दैनिक ट्रैकिंग लॉग अभी तक संकलित नहीं किए गए हैं।</p>
                         </div>`;
                 });
         }
 
         function renderActiveFacilityData() {
             const selector = document.getElementById("facility-selector");
-            const activeFacility = selector.value;
-            document.getElementById("display-facility-name").innerText = activeFacility;
+            const activeFacilityId = selector.value;
+            const activeFacilityDisplay = selector.options[selector.selectedIndex].text;
+            
+            document.getElementById("display-facility-name").innerText = activeFacilityDisplay;
             
             const badge = document.getElementById("display-status-badge");
             const contentArea = document.getElementById("dynamic-content-area");
             document.getElementById("search-bar").value = "";
 
-            // Safely look up matching key using lowercase
-            const facilityExceptions = GLOBAL_CDN_RAW_DATA[activeFacility.toLowerCase().trim()] || null;
+            const facilityData = GLOBAL_CDN_RAW_DATA[activeFacilityId.toLowerCase().trim()];
 
-            let totalExceptions = 0;
-            if (facilityExceptions && facilityExceptions !== "UPDATED" && typeof facilityExceptions === 'object') {
-                // If it's an exception object, count the inactive tests
-                totalExceptions = Object.keys(facilityExceptions).filter(k => k !== "systemStatus").length;
+            if (!facilityData || facilityData === "PENDING" || facilityData.systemStatus === "PENDING") {
+                badge.className = "status-badge status-pending";
+                badge.innerText = "Updation in Progress / अपडेशन प्रक्रिया में";
+                contentArea.innerHTML = `
+                    <div class="alert alert-warning text-center border-0 py-5 my-2 shadow-sm" style="border-radius: 16px;">
+                        <h4 class="fw-bold mb-2">⚠️ Updation In Progress / अपडेशन प्रक्रिया में</h4>
+                        <p class="mb-2 text-secondary fw-medium">Daily tracking logs haven't been broadcasted by this Laboratory yet today.</p>
+                        <p class="mb-0 text-secondary fw-medium" style="font-size: 0.95rem;">इस प्रयोगशाला इकाई द्वारा आज का दैनिक ट्रैकिंग लॉग अभी तक प्रसारित नहीं किया गया है।</p>
+                    </div>`;
+                return;
             }
             
+            let facilityExceptions = (typeof facilityData === 'object') ? facilityData : {};
+            const totalExceptions = Object.keys(facilityExceptions).filter(k => k !== "systemStatus").length;
             const operationalCount = 73 - totalExceptions;
 
             if (totalExceptions === 0) {
@@ -247,13 +276,9 @@
                         <div class="row g-3">`;
 
                 testList.forEach((test) => {
-                    // Match test names accurately case-insensitive
                     let isDown = null;
-                    if (facilityExceptions && typeof facilityExceptions === 'object') {
-                        // Find if test exists inside down items case-insensitively
-                        const matchKey = Object.keys(facilityExceptions).find(k => k.toLowerCase().trim() === test.toLowerCase().trim());
-                        if (matchKey) isDown = facilityExceptions[matchKey];
-                    }
+                    const matchKey = Object.keys(facilityExceptions).find(k => k.toLowerCase().trim() === test.toLowerCase().trim());
+                    if (matchKey) isDown = facilityExceptions[matchKey];
 
                     const cardStatusClass = isDown ? "test-card-inactive" : "test-card-active";
                     const statusBadge = isDown ? 
@@ -311,7 +336,6 @@
                     if (nameField) {
                         const textValue = (nameField.textContent || nameField.innerText).toLowerCase();
                         if (textValue.indexOf(query) > -1) {
-                            // Using standard display styling to prevent search breakage
                             cards[j].style.display = "block";
                             visibleCardsInSection++;
                         } else {
@@ -319,7 +343,6 @@
                         }
                     }
                 }
-
                 sections[i].style.display = (visibleCardsInSection > 0 || query === "") ? "block" : "none";
             }
         }
