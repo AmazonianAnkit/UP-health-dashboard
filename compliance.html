@@ -90,94 +90,105 @@
 
         let metrics = { total: 0, compliant: 0, pending: 0 };
 
-        async function auditStatewideCompliance() {
-            const root = document.getElementById("compliance-ledger-root");
-            let ledgerHTML = "";
+       async function auditStatewideCompliance() {
+    const root = document.getElementById("compliance-ledger-root");
+    let ledgerHTML = "";
+    
+    metrics.total = Object.keys(MASTER_DISTRICT_REGISTRY).length;
+    metrics.compliant = 0;
+    metrics.pending = 0;
+
+    // 1. Map out the expected facility list for cross-checking
+    const EXPECTED_FACILITIES_MAP = {
+        "lucknow": ["CHC Gosaiganj", "CHC Kakori", "CHC Malihabad", "CHC Chinhat", "CHC Mohanlalganj", "CHC Bakshi Ka Talab", "CHC Mal", "CHC Sarojini Nagar"],
+        "agra": ["Achhnera", "Akola", "Bah", "Barauli Ahir", "CHC Bichpuri", "CHC Etmadpur", "Fatehabad", "Fatehpur Sikri", "Jagner", "Jaitpur Kalan", "Khandauli", "CHC Kheragarh", "Pinahat", "Saiya", "Shamsabad"],
+        "aligarh": ["Atrauli", "Gonda", "Iglas", "Jawa", "Khair", "Lodha", "Tappal", "Dhanipur", "Bijouli", "CHC Akrabad", "CHC Chandaus", "Chharra"],
+        "g_b_nagar": ["Akbarpur", "Baskhari", "Jahangirganj", "Jalalpur", "Katehari", "CHC Alapur", "CHC Bhiti", "Bhiyaon", "Tanda"]
+    };
+
+    for (const [slug, meta] of Object.entries(MASTER_DISTRICT_REGISTRY)) {
+        let nonCompliantFacilities = [];
+        let isDistrictCompletelyPending = false;
+        let processedData = {};
+
+        try {
+            const response = await fetch(`./${slug}/Data.json`, { cache: "no-store" });
+            if (!response.ok) throw new Error("Unpublished");
             
-            metrics.total = Object.keys(MASTER_DISTRICT_REGISTRY).length;
-            metrics.compliant = 0;
-            metrics.pending = 0;
+            const data = await response.json();
+            
+            // Standardize existing keys to lowercase
+            for (let k in data) { 
+                processedData[k.toLowerCase().trim()] = data[k]; 
+            }
+        } catch (err) {
+            isDistrictCompletelyPending = true;
+        }
 
-            for (const [slug, meta] of Object.entries(MASTER_DISTRICT_REGISTRY)) {
-                let nonCompliantFacilities = [];
-                let isDistrictCompletelyPending = false;
+        if (!isDistrictCompletelyPending) {
+            const expectedList = EXPECTED_FACILITIES_MAP[slug] || [];
+            
+            // 2. Cross-check expected facilities against the keys actually present in the file
+            expectedList.forEach(facility => {
+                const searchKey = facility.toLowerCase().trim();
+                const facilityData = processedData[searchKey];
 
-                try {
-                    const response = await fetch(`./${slug}/Data.json`, { cache: "no-store" });
-                    if (!response.ok) throw new Error("Unpublished");
-                    
-                    const data = await response.json();
-                    
-                    // Standardize keys to lowercase for clean matching
-                    let processedData = {};
-                    for (let k in data) { processedData[k.toLowerCase().trim()] = data[k]; }
-
-                    // Loop through expected facilities and check status
-                    // Note: This relies on individual facility IDs being mapped dynamically.
-                    // For the dashboard validation engine, if the file is up but specific keys are PENDING:
-                    let activeSubmissions = 0;
-                    
-                    for (let key in processedData) {
-                        if (processedData[key] === "PENDING" || processedData[key].systemStatus === "PENDING") {
-                            nonCompliantFacilities.push(key.toUpperCase());
-                        } else {
-                            activeSubmissions++;
-                        }
-                    }
-
-                    // Handle edge cases where data file exists but has no active rows yet
-                    if (activeSubmissions === 0 && Object.keys(processedData).length === 0) {
-                        isDistrictCompletelyPending = true;
-                    }
-
-                } catch (err) {
-                    isDistrictCompletelyPending = true;
+                if (!facilityData || facilityData === "PENDING" || facilityData.systemStatus === "PENDING") {
+                    // Flagged if missing entirely from JSON or explicitly set to PENDING
+                    nonCompliantFacilities.push(facility);
                 }
+            });
 
-                let statusClass = "";
-                let headerClass = "";
-                let statusBadge = "";
-                let bodyContent = "";
+            // If the JSON is completely empty, mark the whole district pending
+            if (Object.keys(processedData).length === 0) {
+                isDistrictCompletelyPending = true;
+            }
+        }
 
-                if (isDistrictCompletelyPending || nonCompliantFacilities.length > 0) {
-                    metrics.pending++;
-                    statusClass = "status-block-pending";
-                    headerClass = "card-header-noncompliant";
-                    statusBadge = `<span class="badge bg-danger px-3 py-2">⚠️ ACTION REQUIRED</span>`;
-                    
-                    if (isDistrictCompletelyPending) {
-                        bodyContent = `<div class="p-3 text-danger fw-medium small">❌ Zero communication logs received today. Entire district is pending.</div>`;
-                    } else {
-                        bodyContent = `
-                            <div class="p-3">
-                                <div class="text-secondary small fw-bold text-uppercase mb-2">Defaulter Facilities (${nonCompliantFacilities.length}):</div>
-                                <div>${nonCompliantFacilities.map(f => `<span class="facility-tag">${f}</span>`).join('')}</div>
-                            </div>`;
-                    }
-                } else {
-                    metrics.compliant++;
-                    statusClass = "status-block-compliant";
-                    headerClass = "card-header-compliant";
-                    statusBadge = `<span class="badge bg-success px-3 py-2">🟢 100% COMPLIANT</span>`;
-                    bodyContent = `<div class="p-3 text-success fw-medium small">✓ All laboratory data packets transmitted successfully for today.</div>`;
-                }
+        let statusClass = "";
+        let headerClass = "";
+        let statusBadge = "";
+        let bodyContent = "";
 
-                ledgerHTML += `
-                    <div class="compliance-card ${statusClass}" data-name="${meta.name.toLowerCase()}">
-                        <div class="${headerClass} d-flex justify-content-between align-items-center flex-wrap gap-2">
-                            <div>
-                                <h4 class="fw-bold m-0 text-dark" style="font-size: 1.15rem;">${meta.name}</h4>
-                                <small class="text-muted fw-semibold">Target Units: ${meta.totalFacilities}</small>
-                            </div>
-                            <div>${statusBadge}</div>
-                        </div>
-                        ${bodyContent}
+        if (isDistrictCompletelyPending || nonCompliantFacilities.length > 0) {
+            metrics.pending++;
+            statusClass = "status-block-pending";
+            headerClass = "card-header-noncompliant";
+            statusBadge = `<span class="badge bg-danger px-3 py-2">⚠️ ACTION REQUIRED</span>`;
+            
+            if (isDistrictCompletelyPending) {
+                bodyContent = `<div class="p-3 text-danger fw-medium small">❌ Zero communication logs received today. Entire district is pending.</div>`;
+            } else {
+                bodyContent = `
+                    <div class="p-3">
+                        <div class="text-secondary small fw-bold text-uppercase mb-2">Defaulter Facilities (${nonCompliantFacilities.length}):</div>
+                        <div>${nonCompliantFacilities.map(f => `<span class="facility-tag">${f}</span>`).join('')}</div>
                     </div>`;
             }
-
-            root.innerHTML = ledgerHTML;
-            updateMetricsDisplay();
+        } else {
+            metrics.compliant++;
+            statusClass = "status-block-compliant";
+            headerClass = "card-header-compliant";
+            statusBadge = `<span class="badge bg-success px-3 py-2">🟢 100% COMPLIANT</span>`;
+            bodyContent = `<div class="p-3 text-success fw-medium small">✓ All laboratory data packets transmitted successfully for today.</div>`;
         }
+
+        ledgerHTML += `
+            <div class="compliance-card ${statusClass}" data-name="${meta.name.toLowerCase()}">
+                <div class="${headerClass} d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <h4 class="fw-bold m-0 text-dark" style="font-size: 1.15rem;">${meta.name}</h4>
+                        <small class="text-muted fw-semibold">Target Units: ${meta.totalFacilities}</small>
+                    </div>
+                    <div>${statusBadge}</div>
+                </div>
+                ${bodyContent}
+            </div>`;
+    }
+
+    root.innerHTML = ledgerHTML;
+    updateMetricsDisplay();
+}
 
         function updateMetricsDisplay() {
             document.getElementById("metric-total").innerText = metrics.total;
