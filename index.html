@@ -176,14 +176,22 @@
             document.getElementById("current-date-badge").innerText = today.toLocaleDateString('en-US', options);
         }
 
-        function parseDistrictRoute() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const distParam = urlParams.get('district');
-            if (distParam) {
-                TARGET_DISTRICT = distParam.toLowerCase().trim();
-            }
-            document.getElementById("title-district-name").innerText = TARGET_DISTRICT.charAt(0).toUpperCase() + TARGET_DISTRICT.slice(1);
-        }
+       function parseDistrictRoute() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const distParam = urlParams.get('district');
+    if (distParam) {
+        TARGET_DISTRICT = distParam.toLowerCase().trim();
+    }
+    
+    // Capitalize the first letter for display (e.g., agra -> Agra)
+    const formattedDistrictName = TARGET_DISTRICT.charAt(0).toUpperCase() + TARGET_DISTRICT.slice(1);
+    
+    // This updates the sub-title next to "Live Laboratory Test Availability..."
+    const titleElement = document.getElementById("title-district-name");
+    if (titleElement) {
+        titleElement.innerText = formattedDistrictName;
+    }
+}
 
         function buildFacilityDropdown() {
             const selector = document.getElementById("facility-selector");
