@@ -1,1 +1,64 @@
-{}
+{
+  "Atrauli": {
+    "Hemoglobin": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Reagent Out of Stock",
+      "reasonHi": "अभिकर्मक अनुपलब्ध"
+    },
+    "Total leucocyte count": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
+    },
+    "Differential leucocyte count": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Both Reasons",
+      "reasonHi": "उपरोक्त दोनों कारण"
+    },
+    "HCG urine test": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Both Reasons",
+      "reasonHi": "उपरोक्त दोनों कारण"
+    },
+    "Urine routine test": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Both Reasons",
+      "reasonHi": "उपरोक्त दोनों कारण"
+    },
+    "Dengue test": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
+    },
+    "RPR/VDRL test": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
+    },
+    "Blood sugar": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Reagent Out of Stock",
+      "reasonHi": "अभिकर्मक अनुपलब्ध"
+    },
+    "Glucose tolerance test (GTT)": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Reagent Out of Stock",
+      "reasonHi": "अभिकर्मक अनुपलब्ध"
+    },
+    "Drug overdose test": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Both Reasons",
+      "reasonHi": "उपरोक्त दोनों कारण"
+    }
+  }
+}
