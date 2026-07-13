@@ -480,5 +480,67 @@
       "reasonEn": "Both Reasons",
       "reasonHi": "उपरोक्त दोनों कारण"
     }
+  },
+  "Bhiyaon": {
+    "Prothrombin Time (PT) and INR": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Reagent Out of Stock",
+      "reasonHi": "अभिकर्मक अनुपलब्ध"
+    },
+    "Activated partial thromboplastin time (APTT)": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
+    },
+    "Urine for creatinine and ACR": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
+    },
+    "Stool for ova and cyst": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Both Reasons",
+      "reasonHi": "उपरोक्त दोनों कारण"
+    },
+    "TB Mantoux": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
+    },
+    "Rapid test for cholera": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Both Reasons",
+      "reasonHi": "उपरोक्त दोनों कारण"
+    },
+    "Uric acid": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Reagent Out of Stock",
+      "reasonHi": "अभिकर्मक अनुपलब्ध"
+    },
+    "HbA1c": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
+    },
+    "Troponin I": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Reagent Out of Stock",
+      "reasonHi": "अभिकर्मक अनुपलब्ध"
+    },
+    "CRP (Quantitative)": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Reagent Out of Stock",
+      "reasonHi": "अभिकर्मक अनुपलब्ध"
+    }
   }
 }
