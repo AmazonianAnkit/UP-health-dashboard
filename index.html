@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Live Laboratory Test Availability Status Tracker</title>
   
-  <!-- Tailwind CSS for high-quality, lightweight styling -->
+  <!-- Tailwind CSS for modern, fast styling -->
   <script src="https://cdn.tailwindcss.com"></script>
   
   <!-- Google Fonts -->
@@ -16,7 +16,6 @@
       font-family: 'Inter', 'Noto Sans Devanagari', sans-serif;
       background-color: #f4f6f9;
     }
-    /* Custom style matching the brand-blue top header block */
     .brand-gradient {
       background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%);
     }
@@ -35,6 +34,11 @@
       background-color: #f3f4f6 !important; /* Soft Gray */
       color: #4b5563 !important;            /* Dark Gray Text */
       border: 1px solid #e5e7eb !important;
+    }
+    .badge-success {
+      background-color: #d1fae5 !important; /* Soft Green */
+      color: #065f46 !important;            /* Dark Green Text */
+      border: 1px solid #a7f3d0 !important;
     }
   </style>
 </head>
@@ -65,7 +69,7 @@
           SELECT LABORATORY FACILITY / प्रयोगशाला इकाई का चयन करें
         </label>
         <select id="facility-select" class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
-          <option value="ALL">All Facilities / सभी प्रयोगशालाएं</option>
+          <option value="">-- Choose a Facility / प्रयोगशाला चुनें --</option>
         </select>
       </div>
 
@@ -75,7 +79,7 @@
           SEARCH DIAGNOSTIC TEST / जांच का नाम खोजें
         </label>
         <input type="text" id="test-search" placeholder="Type shorthand or name (e.g. TLC, Hb, Sugar)..." 
-               class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
+               class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" disabled>
       </div>
 
     </div>
@@ -84,15 +88,30 @@
          RENDERED STATUS BOARD/CONTAINER
          ========================================== -->
     <div id="status-container" class="space-y-4">
-      <!-- Dynamic loading state / Connection log block -->
-      <div id="connection-loader" class="bg-white rounded-2xl p-8 text-center shadow-md">
+      <!-- Welcome Message UI (Shown at initial stage/before selection) -->
+      <div id="selection-prompt" class="bg-white rounded-2xl p-8 text-center shadow-md border border-dashed border-gray-200">
+        <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+        </div>
+        <h3 class="text-base font-bold text-gray-800 leading-snug">
+          Please choose the Facility Name to know the available tests Status
+        </h3>
+        <p class="text-xs font-semibold text-blue-600 mt-2 leading-relaxed">
+          उपलब्ध जांचों की स्थिति जानने के लिए कृपया चिकित्सा इकाई (प्रयोगशाला) का नाम चुनें।
+        </p>
+      </div>
+
+      <!-- Connecting Loader (Hidden initially, used during network fetch) -->
+      <div id="connection-loader" class="hidden bg-white rounded-2xl p-8 text-center shadow-md">
         <h3 class="text-xl font-bold text-gray-800 mb-2">Connecting...</h3>
         <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-amber-50 text-amber-700 border border-amber-200">
           <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-amber-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          Loading Repository Cache...
+          Loading Registry Cache...
         </span>
       </div>
     </div>
@@ -103,7 +122,13 @@
        FRONT-END APPLICATION ARCHITECTURE
        ========================================== -->
   <script>
-    // 1. Expanded Regional Dynamic Registry Mapping
+    // 1. Full Master List of Facilities with Expected Lab Tests for Availability Logic
+    const MASTER_TESTS = [
+      "Hemoglobin (Hb)", "TLC", "DLC", "RBC Count", "Platelet Count", 
+      "Blood Sugar (Fasting)", "Blood Sugar (Random)", "Serum Bilirubin", 
+      "SGOT", "SGPT", "Widal Test", "Malaria Card Test", "Urine Routine"
+    ];
+
     const DISTRICT_REGISTRY = {
       "lucknow": {
         name: "Lucknow",
@@ -241,14 +266,18 @@
       const container = document.getElementById("status-container");
 
       try {
+        loader.classList.remove("hidden");
         const response = await fetch(dataUrl + '?nocache=' + new Date().getTime());
         if (!response.ok) throw new Error("File not found on repository CDN");
         
         apiData = await response.json();
-        if (loader) loader.style.display = "none";
-        renderDashboard();
+        loader.classList.add("hidden");
+        
+        // Let search input become functional now that data is loaded
+        document.getElementById("test-search").removeAttribute("disabled");
       } catch (err) {
         console.error("Fetch Exception:", err);
+        loader.classList.add("hidden");
         container.innerHTML = `
           <div class="bg-red-50 border border-red-200 text-red-800 rounded-2xl p-6 text-center shadow-sm">
             <h4 class="font-bold text-lg mb-1">Configuration Offline</h4>
@@ -259,123 +288,199 @@
       }
     }
 
-    // 5. Reactive UI Rendering Engine
+    // 5. Reactive UI Rendering Engine (Bilingual Breakdown & Dynamic Count Handling)
     function renderDashboard() {
       const selectedFacilityId = dropdownSelect.value;
       const searchFilter = document.getElementById("test-search").value.toLowerCase().trim();
       const container = document.getElementById("status-container");
+
+      // Stage 1: Force the Welcome Message if no facility has been chosen yet
+      if (!selectedFacilityId) {
+        container.innerHTML = `
+          <div id="selection-prompt" class="bg-white rounded-2xl p-8 text-center shadow-md border border-dashed border-gray-200">
+            <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <h3 class="text-base font-bold text-gray-800 leading-snug">
+              Please choose the Facility Name to know the available tests Status
+            </h3>
+            <p class="text-xs font-semibold text-blue-600 mt-2 leading-relaxed">
+              उपलब्ध जांचों की स्थिति जानने के लिए कृपया चिकित्सा इकाई (प्रयोगशाला) का नाम चुनें।
+            </p>
+          </div>
+        `;
+        return;
+      }
+
       container.innerHTML = "";
 
-      expectedFacilities.forEach(facilityObj => {
-        const facilityId = facilityObj.id;
-        const facilityDisplay = facilityObj.display;
+      // Find selected facility object configurations
+      const selectedFacilityObj = expectedFacilities.find(f => f.id === selectedFacilityId);
+      if (!selectedFacilityObj) return;
 
-        // Filter out if dropdown has a specific lab locked
-        if (selectedFacilityId !== "ALL" && selectedFacilityId !== facilityId) return;
+      const facilityId = selectedFacilityObj.id;
+      const facilityDisplay = selectedFacilityObj.display;
 
-        const facilityData = apiData[facilityId];
-        let statusTitleEn = "";
-        let statusTitleHi = "";
-        let subTextEn = "";
-        let subTextHi = "";
-        let badgeClass = "";
-        let testsListHTML = "";
+      const facilityData = apiData[facilityId];
+      let statusTitleEn = "";
+      let statusTitleHi = "";
+      let subTextEn = "";
+      let subTextHi = "";
+      let badgeClass = "";
+      let testsListHTML = "";
 
-        // Determine matching state of this specific facility
-        if (apiData.hasOwnProperty(facilityId)) {
-          const downtimes = facilityData || {};
-          const downtimeKeys = Object.keys(downtimes);
+      // Dynamic calculation parameters
+      let unavailableTestsList = [];
+      let availableTestsList = [];
 
-          if (downtimeKeys.length === 0) {
-            // ✅ TRANSITIONAL FALLBACK: Updation in progress state (0 active errors)
-            statusTitleEn = "Updation in Progress";
-            statusTitleHi = "अद्यतन प्रगति पर है";
-            subTextEn = "Waiting for the lab's daily verification check-in.";
-            subTextHi = "प्रयोगशाला के दैनिक सत्यापन चेक-इन की प्रतीक्षा है।";
-            badgeClass = "badge-updating";
+      if (apiData.hasOwnProperty(facilityId)) {
+        const loggedDowntimes = facilityData || {};
+
+        // Parse and classify every test in the master catalog
+        MASTER_TESTS.forEach(testName => {
+          if (loggedDowntimes.hasOwnProperty(testName)) {
+            unavailableTestsList.push({
+              name: testName,
+              reasonEn: loggedDowntimes[testName].reasonEn || "Unavailable",
+              reasonHi: loggedDowntimes[testName].reasonHi || "अनुपलब्ध"
+            });
           } else {
-            // Active Exception Downtimes Logged
-            statusTitleEn = "Downtime Logged";
-            statusTitleHi = "डाउनटाइम लॉग किया गया";
-            subTextEn = `${downtimeKeys.length} test(s) currently unavailable.`;
-            subTextHi = `${downtimeKeys.length} परीक्षण वर्तमान में अनुपलब्ध हैं।`;
-            badgeClass = "badge-danger";
-
-            // Process specific individual test lines
-            let testRows = [];
-            for (let test in downtimes) {
-              // Apply input search query match if active
-              if (searchFilter !== "" && !test.toLowerCase().includes(searchFilter)) continue;
-
-              const tObj = downtimes[test];
-              testRows.push(`
-                <div class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center py-2.5 border-b border-dashed border-red-100 last:border-b-0">
-                  <span class="font-semibold text-sm text-gray-800">${test}</span>
-                  <div class="text-left sm:text-right mt-1 sm:mt-0">
-                    <span class="text-xs font-medium text-red-600 block">${tObj.reasonEn || 'Not Available'}</span>
-                    <span class="text-[11px] text-red-500 block">${tObj.reasonHi || 'उपलब्ध नहीं'}</span>
-                  </div>
-                </div>
-              `);
-            }
-
-            if (testRows.length > 0) {
-              testsListHTML = `
-                <div class="mt-4 bg-red-50/50 rounded-xl p-4 border border-red-100 max-h-60 overflow-y-auto">
-                  ${testRows.join("")}
-                </div>
-              `;
-            } else if (searchFilter !== "") {
-              // If query filters out the current facility's entries
-              return;
-            }
+            availableTestsList.push({
+              name: testName
+            });
           }
-        } else {
-          // Lab is entirely missing from the compiled json payload
-          statusTitleEn = "Status Not Updated";
-          statusTitleHi = "स्थिति अद्यतन नहीं है";
-          subTextEn = "No reporting data received from this lab today.";
-          subTextHi = "आज इस प्रयोगशाला से कोई रिपोर्टिंग डेटा प्राप्त नहीं हुआ है।";
-          badgeClass = "badge-unreported";
+        });
+
+        // Search text filtering logic (initials/abbreviation & full name check)
+        if (searchFilter !== "") {
+          unavailableTestsList = unavailableTestsList.filter(t => t.name.toLowerCase().includes(searchFilter));
+          availableTestsList = availableTestsList.filter(t => t.name.toLowerCase().includes(searchFilter));
         }
 
-        // Output Card Markup Block
-        const card = document.createElement("div");
-        card.className = "bg-white rounded-2xl shadow-md border border-gray-100 p-5 hover:shadow-lg transition duration-200 ease-in-out";
-        card.innerHTML = `
-          <div class="flex items-start justify-between gap-4">
-            <div>
-              <h4 class="font-bold text-gray-900 text-lg leading-snug">${facilityDisplay}</h4>
-              <p class="text-xs font-medium text-gray-500 mt-1">${subTextEn}</p>
-              <p class="text-[11px] text-gray-400 mt-0.5">${subTextHi}</p>
-            </div>
-            <div class="text-right flex-shrink-0">
-              <span class="inline-block px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm ${badgeClass}">
-                ${statusTitleEn}<br/>
-                <span class="text-[10px] font-medium opacity-90">${statusTitleHi}</span>
-              </span>
-            </div>
-          </div>
-          ${testsListHTML}
-        `;
-        container.appendChild(card);
-      });
+        const totalUnavailable = unavailableTestsList.length;
+        const totalAvailable = availableTestsList.length;
 
-      // Simple handling if searches yield nothing
-      if (container.children.length === 0) {
-        container.innerHTML = `
-          <div class="bg-white rounded-2xl p-8 text-center shadow-md">
-            <p class="text-sm font-semibold text-gray-500">No matching search entries found / कोई मिलान परिणाम नहीं मिला।</p>
+        if (Object.keys(loggedDowntimes).length === 0) {
+          // Case 1: System Online, 0 Active Downtimes reported
+          statusTitleEn = "Online / Updating";
+          statusTitleHi = "सक्रिय / अद्यतन प्रगति पर";
+          subTextEn = "All tests functioning normally.";
+          subTextHi = "सभी परीक्षण सामान्य रूप से संचालित हो रहे हैं।";
+          badgeClass = "badge-updating";
+        } else {
+          // Case 2: System Online, active downtimes recorded
+          statusTitleEn = "Downtime Logged";
+          statusTitleHi = "डाउनटाइम दर्ज";
+          subTextEn = `${totalUnavailable} test(s) currently suspended.`;
+          subTextHi = `${totalUnavailable} परीक्षण फिलहाल बाधित हैं।`;
+          badgeClass = "badge-danger";
+        }
+
+        // Build HTML output blocks
+        let unavailableHTML = "";
+        let availableHTML = "";
+
+        // Section 1: Unavailable Tests Rows
+        if (unavailableTestsList.length > 0) {
+          unavailableHTML = `
+            <div class="mb-4">
+              <div class="flex items-center justify-between mb-2">
+                <h5 class="text-xs font-bold uppercase tracking-wider text-red-600">Unavailable Tests / अनुपलब्ध जांचें</h5>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-800 border border-red-200">
+                  Count: ${totalUnavailable}
+                </span>
+              </div>
+              <div class="bg-red-50/50 rounded-xl p-3 border border-red-100 space-y-2">
+                ${unavailableTestsList.map(t => `
+                  <div class="flex justify-between items-center py-2 border-b border-dashed border-red-100 last:border-0 last:pb-0">
+                    <span class="font-semibold text-sm text-gray-800">${t.name}</span>
+                    <div class="text-right">
+                      <span class="text-xs font-semibold text-red-600 block">${t.reasonEn}</span>
+                      <span class="text-[10px] text-red-500 block">${t.reasonHi}</span>
+                    </div>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+          `;
+        }
+
+        // Section 2: Available Tests Rows
+        if (availableTestsList.length > 0) {
+          availableHTML = `
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <h5 class="text-xs font-bold uppercase tracking-wider text-emerald-600">Available Tests / उपलब्ध जांचें</h5>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  Count: ${totalAvailable}
+                </span>
+              </div>
+              <div class="bg-emerald-50/30 rounded-xl p-3 border border-emerald-100 space-y-2">
+                ${availableTestsList.map(t => `
+                  <div class="flex justify-between items-center py-2 border-b border-dashed border-emerald-100/50 last:border-0 last:pb-0">
+                    <span class="font-semibold text-sm text-gray-800">${t.name}</span>
+                    <span class="px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-100 text-emerald-800">
+                      Available / उपलब्ध
+                    </span>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+          `;
+        }
+
+        testsListHTML = `
+          <div class="mt-6 border-t border-gray-100 pt-4 space-y-6">
+            ${unavailableHTML}
+            ${availableHTML}
+          </div>
+        `;
+
+      } else {
+        // Case 3: Facility has not checked in today
+        statusTitleEn = "Status Unreported";
+        statusTitleHi = "स्थिति रिपोर्ट नहीं की गई";
+        subTextEn = "No daily update packet received.";
+        subTextHi = "आज कोई दैनिक अपडेट प्राप्त नहीं हुआ।";
+        badgeClass = "badge-unreported";
+        
+        testsListHTML = `
+          <div class="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-4 text-center">
+            <p class="text-xs text-gray-500 font-medium">Please check back in later or contact local facility administration.</p>
+            <p class="text-[11px] text-gray-400 mt-0.5">कृपया बाद में पुनः जांच करें या स्थानीय चिकित्सा प्रशासन से संपर्क करें।</p>
           </div>
         `;
       }
+
+      // Append Card UI Elements to Container
+      const card = document.createElement("div");
+      card.className = "bg-white rounded-2xl shadow-md border border-gray-100 p-5";
+      card.innerHTML = `
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h4 class="font-bold text-gray-900 text-lg leading-snug">${facilityDisplay}</h4>
+            <p class="text-xs font-medium text-gray-500 mt-1">${subTextEn}</p>
+            <p class="text-[11px] text-gray-400 mt-0.5">${subTextHi}</p>
+          </div>
+          <div class="text-right flex-shrink-0">
+            <span class="inline-block px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm ${badgeClass}">
+              ${statusTitleEn}<br/>
+              <span class="text-[10px] font-medium opacity-90">${statusTitleHi}</span>
+            </span>
+          </div>
+        </div>
+        ${testsListHTML}
+      `;
+      container.appendChild(card);
     }
 
-    // 6. Reactive UI DOM Listeners
+    // 6. Reactive UI DOM Event Listeners
     dropdownSelect.addEventListener("change", renderDashboard);
     document.getElementById("test-search").addEventListener("input", renderDashboard);
 
-    // Bootstrap data pull on start
+    // Bootstrap data cache connection
     fetchTrackerPayload();
   </script>
 </body>
