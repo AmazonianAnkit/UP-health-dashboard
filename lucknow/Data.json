@@ -258,5 +258,127 @@
       "reasonEn": "Reagent Out of Stock",
       "reasonHi": "अभिकर्मक अनुपलब्ध"
     }
+  },
+  "CHC Mohanlalganj": {
+    "Hemoglobin": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Reagent Out of Stock",
+      "reasonHi": "अभिकर्मक अनुपलब्ध"
+    },
+    "Total leucocyte count": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
+    },
+    "Differential leucocyte count": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Both Reasons",
+      "reasonHi": "उपरोक्त दोनों कारण"
+    },
+    "Platelet count": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
+    },
+    "HCG urine test": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Both Reasons",
+      "reasonHi": "उपरोक्त दोनों कारण"
+    },
+    "Urine routine test": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
+    },
+    "Urine microscopy": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Reagent Out of Stock",
+      "reasonHi": "अभिकर्मक अनुपलब्ध"
+    },
+    "Urine for microalbumin": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
+    },
+    "Filaria test": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
+    },
+    "TB Mantoux": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Both Reasons",
+      "reasonHi": "उपरोक्त दोनों कारण"
+    },
+    "Rapid test for cholera": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
+    },
+    "CBNAAT": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Reagent Out of Stock",
+      "reasonHi": "अभिकर्मक अनुपलब्ध"
+    },
+    "Iron": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
+    },
+    "TIBC": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Reagent Out of Stock",
+      "reasonHi": "अभिकर्मक अनुपलब्ध"
+    },
+    "LDH": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
+    },
+    "24 hr urinary protein": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Both Reasons",
+      "reasonHi": "उपरोक्त दोनों कारण"
+    },
+    "Pap smear": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
+    },
+    "CSF analysis": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Both Reasons",
+      "reasonHi": "उपरोक्त दोनों कारण"
+    },
+    "Fluid analysis": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
+    },
+    "Drug overdose test": {
+      "statusEn": "NOT AVAILABLE",
+      "statusHi": "उपलब्ध नहीं",
+      "reasonEn": "Reagent Out of Stock",
+      "reasonHi": "अभिकर्मक अनुपलब्ध"
+    }
   }
 }
