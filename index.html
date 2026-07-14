@@ -83,7 +83,7 @@
   </div>
 
   <script>
-    // Exact 73-test array matching the uploaded list
+    // Exact 73-test array matching the uploaded official list
     const MASTER_73_TESTS = [
       { id: 1, en: "Hemoglobin", hi: "हीमोग्लोबिन" },
       { id: 2, en: "Total leucocyte count", hi: "TLC / कुल ल्यूकोसाइट काउंट" },
@@ -132,7 +132,7 @@
       { id: 45, en: "Albumin & A/G ratio", hi: "एल्ब्यूमिन और ए/जी अनुपात" },
       { id: 46, en: "Globulin", hi: "ग्लोबुलिन" },
       { id: 47, en: "Total cholesterol", hi: "कुल कोलेस्ट्रॉल" },
-      { id: 48, en: "Triglycerides", hi: "ट्राइग्लिसराइड्स" },
+      { id: 48, open: "Triglycerides", en: "Triglycerides", hi: "ट्राइग्लिसराइड्स" },
       { id: 49, en: "VLDL", hi: "वीएलडीएल (VLDL)" },
       { id: 50, en: "HDL", hi: "एचडीएल (HDL)" },
       { id: 51, en: "LDL", hi: "एलडीएल (LDL)" },
@@ -315,13 +315,40 @@
       const facilityId = selectedFacilityObj.id;
       const facilityDisplay = selectedFacilityObj.display;
 
+      // Check if the facility has ever submitted status (is its key present in JSON?)
+      const exactDataKey = Object.keys(apiData).find(key => key.toLowerCase().trim() === facilityId.toLowerCase().trim());
+      
+      if (!exactDataKey) {
+        // RENDER: Bilingual "Status Updation in progress" Screen
+        container.innerHTML = `
+          <div class="bg-white rounded-2xl shadow-md p-6 border border-amber-200 text-center">
+            <div class="w-16 h-16 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 border border-amber-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h4 class="font-bold text-gray-900 text-lg leading-snug">${facilityDisplay}</h4>
+            <div class="mt-4 p-4 bg-amber-50 rounded-xl border border-amber-100">
+              <p class="text-[15px] font-bold text-amber-800">Status Updation in Progress</p>
+              <p class="text-[13px] font-semibold text-amber-700 mt-1">स्थिति अपडेशन प्रगति पर है</p>
+            </div>
+            <p class="text-[13px] text-gray-500 mt-4 leading-relaxed">
+              The status parameters for this facility have not been submitted yet. Updates are currently in progress.
+            </p>
+            <p class="text-[11px] text-gray-400 mt-1.5">
+              इस चिकित्सा इकाई के लिए स्थिति मापदंड अभी जमा नहीं किए गए हैं। अपडेशन वर्तमान में प्रगति पर है।
+            </p>
+          </div>
+        `;
+        return;
+      }
+
       let subTextEn = "Showing status of all laboratory tests.";
       let subTextHi = "सभी प्रयोगशाला परीक्षणों की अद्यतन स्थिति दिखाई जा रही है।";
       let borderClass = "border-gray-100";
       let testsListHTML = "";
 
-      const exactDataKey = Object.keys(apiData).find(key => key.toLowerCase().trim() === facilityId.toLowerCase().trim());
-      const loggedDowntimes = exactDataKey ? (apiData[exactDataKey] || {}) : {};
+      const loggedDowntimes = apiData[exactDataKey] || {};
 
       // Map down times to master list indices
       const mappedDowntimes = {};
