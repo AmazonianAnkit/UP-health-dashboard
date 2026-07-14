@@ -5,10 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Live Laboratory Test Availability Status Tracker</title>
   
-  <!-- Tailwind CSS for modern, fast styling -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -42,71 +40,58 @@
     }
   </style>
 </head>
-<body class="text-gray-800 antialiased min-h-screen pb-12">
+<body class="text-gray-800 antialiased min-h-screen pb-12 text-[15px]">
 
-  <!-- ==========================================
-       HEADER & MAIN BRAND BANNER
-       ========================================== -->
-  <div class="brand-gradient text-white text-center py-8 px-4 rounded-b-[2.5rem] shadow-lg">
+  <div class="brand-gradient text-white text-center py-9 px-4 rounded-b-[2.5rem] shadow-lg">
     <h1 class="text-2xl md:text-3xl font-bold tracking-tight mb-2">उत्तर प्रदेश स्वास्थ्य विभाग</h1>
-    <p class="text-sm md:text-base font-medium opacity-90 mb-4">
+    <p class="text-[15px] md:text-base font-medium opacity-90 mb-4">
       Live Laboratory Test Availability Status Tracker (<span id="district-label">Loading... District</span>)
     </p>
-    <div class="inline-block bg-white text-blue-900 font-semibold px-4 py-1.5 rounded-full text-xs md:text-sm shadow-sm">
+    <div class="inline-block bg-white text-blue-900 font-semibold px-4 py-1.5 rounded-full text-[13px] md:text-[14px] shadow-sm">
       Date: <span id="current-date">Loading...</span>
     </div>
   </div>
 
-  <!-- ==========================================
-       MAIN FILTER DASHBOARD CARD
-       ========================================== -->
   <div class="max-w-md mx-auto -mt-6 px-4">
     <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
       
-      <!-- Facility Selection Dropdown -->
       <div class="mb-4">
-        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">
+        <label class="block text-[13px] font-bold text-gray-500 tracking-wider uppercase mb-2">
           SELECT LABORATORY FACILITY / प्रयोगशाला इकाई का चयन करें
         </label>
-        <select id="facility-select" class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
+        <select id="facility-select" class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-xl px-4 py-3 text-[15px] focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
           <option value="">-- Choose a Facility / प्रयोगशाला चुनें --</option>
         </select>
       </div>
 
-      <!-- Test Search Shorthand Input -->
       <div>
-        <label class="block text-xs font-bold text-gray-500 tracking-wider uppercase mb-2">
+        <label class="block text-[13px] font-bold text-gray-500 tracking-wider uppercase mb-2">
           SEARCH DIAGNOSTIC TEST / जांच का नाम खोजें
         </label>
         <input type="text" id="test-search" placeholder="Type shorthand or name (e.g. TLC, Hb, Sugar)..." 
-               class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" disabled>
+               class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-xl px-4 py-3 text-[15px] focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" disabled>
       </div>
 
     </div>
 
-    <!-- ==========================================
-         RENDERED STATUS BOARD/CONTAINER
-         ========================================== -->
     <div id="status-container" class="space-y-4">
-      <!-- Welcome Message UI (Shown at initial stage/before selection) -->
       <div id="selection-prompt" class="bg-white rounded-2xl p-8 text-center shadow-md border border-dashed border-gray-200">
         <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
           </svg>
         </div>
-        <h3 class="text-base font-bold text-gray-800 leading-snug">
+        <h3 class="text-[16px] font-bold text-gray-800 leading-snug">
           Please choose the Facility Name to know the available tests Status
         </h3>
-        <p class="text-xs font-semibold text-blue-600 mt-2 leading-relaxed">
+        <p class="text-[13px] font-semibold text-blue-600 mt-2 leading-relaxed">
           उपलब्ध जांचों की स्थिति जानने के लिए कृपया चिकित्सा इकाई (प्रयोगशाला) का नाम चुनें।
         </p>
       </div>
 
-      <!-- Connecting Loader (Hidden initially, used during network fetch) -->
       <div id="connection-loader" class="hidden bg-white rounded-2xl p-8 text-center shadow-md">
         <h3 class="text-xl font-bold text-gray-800 mb-2">Connecting...</h3>
-        <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-amber-50 text-amber-700 border border-amber-200">
+        <span class="inline-flex items-center px-4 py-2 rounded-full text-[15px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
           <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-amber-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -118,9 +103,6 @@
 
   </div>
 
-  <!-- ==========================================
-       FRONT-END APPLICATION ARCHITECTURE
-       ========================================== -->
   <script>
     // 1. Full Master List of Facilities with Expected Lab Tests for Availability Logic
     const MASTER_TESTS = [
@@ -208,280 +190,4 @@
           { id: "Tiloi", display: "Tiloi / तिलोई" },
           { id: "CHC Jagdishpur", display: "CHC Jagdishpur / सी.एच.सी. जगदीशपुर" },
           { id: "CHC Singhpur", display: "CHC Singhpur / सी.एच.सी. सिंहपुर" },
-          { id: "Jamo", display: "Jamo / जामो" },
-          { id: "Shukul Bazar", display: "Shukul Bazar / शुकुल बाज़ार" }
-        ]
-      },
-      "amroha": {
-        name: "Amroha",
-        facilities: [
-          { id: "Hasanpur", display: "Hasanpur / हसनपुर" },
-          { id: "Dhanaura", display: "Dhanaura / धनौरा" },
-          { id: "Gajraula", display: "Gajraula / गजरोला" },
-          { id: "Zoya", display: "Zoya / जोया" },
-          { id: "CHC Gangeswari", display: "CHC Gangeswari / सी.एच.सी. गंगेश्वरी" },
-          { id: "CHC Naugaon Sadat", display: "CHC Naugaon Sadat / सी.एच.सी. नौगावां सादात" }
-        ]
-      }
-    };
-
-    // 2. Global State Variable Registry
-    let currentDistrict = "amroha"; // Standard default
-    let expectedFacilities = [];
-    let apiData = {};
-
-    // 3. Extract and parse route params (e.g., index.html?district=lucknow)
-    const urlParams = new URLSearchParams(window.location.search);
-    const routeDistrict = urlParams.get('district');
-    if (routeDistrict && DISTRICT_REGISTRY[routeDistrict.toLowerCase().trim()]) {
-      currentDistrict = routeDistrict.toLowerCase().trim();
-    }
-
-    // Set configuration variables relative to active district
-    const activeConfig = DISTRICT_REGISTRY[currentDistrict];
-    expectedFacilities = activeConfig.facilities;
-    
-    // UI Label Initialization
-    document.getElementById("district-label").innerText = activeConfig.name;
-    document.getElementById("current-date").innerText = new Date().toLocaleDateString('en-IN', {
-      day: '2-digit', month: 'short', year: 'numeric'
-    });
-
-    // Populate the dropdown selectively using the display translation values
-    const dropdownSelect = document.getElementById("facility-select");
-    expectedFacilities.forEach(facilityObj => {
-      let opt = document.createElement("option");
-      opt.value = facilityObj.id;
-      opt.innerText = facilityObj.display;
-      dropdownSelect.appendChild(opt);
-    });
-
-    // 4. Data Extraction Engine from GitHub Repository Endpoint
-    const repoOwner = "AmazonianAnkit";
-    const repoName = "UP-health-dashboard";
-    const dataUrl = `https://${repoOwner}.github.io/${repoName}/${currentDistrict}/Data.json`;
-
-    async function fetchTrackerPayload() {
-      const loader = document.getElementById("connection-loader");
-      const container = document.getElementById("status-container");
-
-      try {
-        loader.classList.remove("hidden");
-        const response = await fetch(dataUrl + '?nocache=' + new Date().getTime());
-        if (!response.ok) throw new Error("File not found on repository CDN");
-        
-        apiData = await response.json();
-        loader.classList.add("hidden");
-        
-        // Let search input become functional now that data is loaded
-        document.getElementById("test-search").removeAttribute("disabled");
-      } catch (err) {
-        console.error("Fetch Exception:", err);
-        loader.classList.add("hidden");
-        container.innerHTML = `
-          <div class="bg-red-50 border border-red-200 text-red-800 rounded-2xl p-6 text-center shadow-sm">
-            <h4 class="font-bold text-lg mb-1">Configuration Offline</h4>
-            <p class="text-sm opacity-90 mb-3">Unable to locate live data for ${activeConfig.name}.</p>
-            <span class="text-xs font-mono bg-red-100 text-red-700 px-2.5 py-1 rounded">Path Error: 404 (Offline)</span>
-          </div>
-        `;
-      }
-    }
-
-    // 5. Reactive UI Rendering Engine (Bilingual Breakdown & Dynamic Count Handling)
-    function renderDashboard() {
-      const selectedFacilityId = dropdownSelect.value;
-      const searchFilter = document.getElementById("test-search").value.toLowerCase().trim();
-      const container = document.getElementById("status-container");
-
-      // Stage 1: Force the Welcome Message if no facility has been chosen yet
-      if (!selectedFacilityId) {
-        container.innerHTML = `
-          <div id="selection-prompt" class="bg-white rounded-2xl p-8 text-center shadow-md border border-dashed border-gray-200">
-            <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-            </div>
-            <h3 class="text-base font-bold text-gray-800 leading-snug">
-              Please choose the Facility Name to know the available tests Status
-            </h3>
-            <p class="text-xs font-semibold text-blue-600 mt-2 leading-relaxed">
-              उपलब्ध जांचों की स्थिति जानने के लिए कृपया चिकित्सा इकाई (प्रयोगशाला) का नाम चुनें।
-            </p>
-          </div>
-        `;
-        return;
-      }
-
-      container.innerHTML = "";
-
-      // Find selected facility object configurations
-      const selectedFacilityObj = expectedFacilities.find(f => f.id === selectedFacilityId);
-      if (!selectedFacilityObj) return;
-
-      const facilityId = selectedFacilityObj.id;
-      const facilityDisplay = selectedFacilityObj.display;
-
-      const facilityData = apiData[facilityId];
-      let statusTitleEn = "";
-      let statusTitleHi = "";
-      let subTextEn = "";
-      let subTextHi = "";
-      let badgeClass = "";
-      let testsListHTML = "";
-
-      // Dynamic calculation parameters
-      let unavailableTestsList = [];
-      let availableTestsList = [];
-
-      if (apiData.hasOwnProperty(facilityId)) {
-        const loggedDowntimes = facilityData || {};
-
-        // Parse and classify every test in the master catalog
-        MASTER_TESTS.forEach(testName => {
-          if (loggedDowntimes.hasOwnProperty(testName)) {
-            unavailableTestsList.push({
-              name: testName,
-              reasonEn: loggedDowntimes[testName].reasonEn || "Unavailable",
-              reasonHi: loggedDowntimes[testName].reasonHi || "अनुपलब्ध"
-            });
-          } else {
-            availableTestsList.push({
-              name: testName
-            });
-          }
-        });
-
-        // Search text filtering logic (initials/abbreviation & full name check)
-        if (searchFilter !== "") {
-          unavailableTestsList = unavailableTestsList.filter(t => t.name.toLowerCase().includes(searchFilter));
-          availableTestsList = availableTestsList.filter(t => t.name.toLowerCase().includes(searchFilter));
-        }
-
-        const totalUnavailable = unavailableTestsList.length;
-        const totalAvailable = availableTestsList.length;
-
-        if (Object.keys(loggedDowntimes).length === 0) {
-          // Case 1: System Online, 0 Active Downtimes reported
-          statusTitleEn = "Online / Updating";
-          statusTitleHi = "सक्रिय / अद्यतन प्रगति पर";
-          subTextEn = "All tests functioning normally.";
-          subTextHi = "सभी परीक्षण सामान्य रूप से संचालित हो रहे हैं।";
-          badgeClass = "badge-updating";
-        } else {
-          // Case 2: System Online, active downtimes recorded
-          statusTitleEn = "Downtime Logged";
-          statusTitleHi = "डाउनटाइम दर्ज";
-          subTextEn = `${totalUnavailable} test(s) currently suspended.`;
-          subTextHi = `${totalUnavailable} परीक्षण फिलहाल बाधित हैं।`;
-          badgeClass = "badge-danger";
-        }
-
-        // Build HTML output blocks
-        let unavailableHTML = "";
-        let availableHTML = "";
-
-        // Section 1: Unavailable Tests Rows
-        if (unavailableTestsList.length > 0) {
-          unavailableHTML = `
-            <div class="mb-4">
-              <div class="flex items-center justify-between mb-2">
-                <h5 class="text-xs font-bold uppercase tracking-wider text-red-600">Unavailable Tests / अनुपलब्ध जांचें</h5>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-800 border border-red-200">
-                  Count: ${totalUnavailable}
-                </span>
-              </div>
-              <div class="bg-red-50/50 rounded-xl p-3 border border-red-100 space-y-2">
-                ${unavailableTestsList.map(t => `
-                  <div class="flex justify-between items-center py-2 border-b border-dashed border-red-100 last:border-0 last:pb-0">
-                    <span class="font-semibold text-sm text-gray-800">${t.name}</span>
-                    <div class="text-right">
-                      <span class="text-xs font-semibold text-red-600 block">${t.reasonEn}</span>
-                      <span class="text-[10px] text-red-500 block">${t.reasonHi}</span>
-                    </div>
-                  </div>
-                `).join("")}
-              </div>
-            </div>
-          `;
-        }
-
-        // Section 2: Available Tests Rows
-        if (availableTestsList.length > 0) {
-          availableHTML = `
-            <div>
-              <div class="flex items-center justify-between mb-2">
-                <h5 class="text-xs font-bold uppercase tracking-wider text-emerald-600">Available Tests / उपलब्ध जांचें</h5>
-                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                  Count: ${totalAvailable}
-                </span>
-              </div>
-              <div class="bg-emerald-50/30 rounded-xl p-3 border border-emerald-100 space-y-2">
-                ${availableTestsList.map(t => `
-                  <div class="flex justify-between items-center py-2 border-b border-dashed border-emerald-100/50 last:border-0 last:pb-0">
-                    <span class="font-semibold text-sm text-gray-800">${t.name}</span>
-                    <span class="px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-100 text-emerald-800">
-                      Available / उपलब्ध
-                    </span>
-                  </div>
-                `).join("")}
-              </div>
-            </div>
-          `;
-        }
-
-        testsListHTML = `
-          <div class="mt-6 border-t border-gray-100 pt-4 space-y-6">
-            ${unavailableHTML}
-            ${availableHTML}
-          </div>
-        `;
-
-      } else {
-        // Case 3: Facility has not checked in today
-        statusTitleEn = "Status Unreported";
-        statusTitleHi = "स्थिति रिपोर्ट नहीं की गई";
-        subTextEn = "No daily update packet received.";
-        subTextHi = "आज कोई दैनिक अपडेट प्राप्त नहीं हुआ।";
-        badgeClass = "badge-unreported";
-        
-        testsListHTML = `
-          <div class="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-4 text-center">
-            <p class="text-xs text-gray-500 font-medium">Please check back in later or contact local facility administration.</p>
-            <p class="text-[11px] text-gray-400 mt-0.5">कृपया बाद में पुनः जांच करें या स्थानीय चिकित्सा प्रशासन से संपर्क करें।</p>
-          </div>
-        `;
-      }
-
-      // Append Card UI Elements to Container
-      const card = document.createElement("div");
-      card.className = "bg-white rounded-2xl shadow-md border border-gray-100 p-5";
-      card.innerHTML = `
-        <div class="flex items-start justify-between gap-4">
-          <div>
-            <h4 class="font-bold text-gray-900 text-lg leading-snug">${facilityDisplay}</h4>
-            <p class="text-xs font-medium text-gray-500 mt-1">${subTextEn}</p>
-            <p class="text-[11px] text-gray-400 mt-0.5">${subTextHi}</p>
-          </div>
-          <div class="text-right flex-shrink-0">
-            <span class="inline-block px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm ${badgeClass}">
-              ${statusTitleEn}<br/>
-              <span class="text-[10px] font-medium opacity-90">${statusTitleHi}</span>
-            </span>
-          </div>
-        </div>
-        ${testsListHTML}
-      `;
-      container.appendChild(card);
-    }
-
-    // 6. Reactive UI DOM Event Listeners
-    dropdownSelect.addEventListener("change", renderDashboard);
-    document.getElementById("test-search").addEventListener("input", renderDashboard);
-
-    // Bootstrap data cache connection
-    fetchTrackerPayload();
-  </script>
-</body>
-</html>
+          { id: "J
