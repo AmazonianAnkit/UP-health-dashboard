@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Live Laboratory Test Availability Status Tracker</title>
   
+  <!-- Tailwind CSS for modern, fast styling -->
   <script src="https://cdn.tailwindcss.com"></script>
   
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -21,6 +23,9 @@
 </head>
 <body class="text-gray-800 antialiased min-h-screen pb-12 text-[15px]">
 
+  <!-- ==========================================
+       HEADER & MAIN BRAND BANNER
+       ========================================== -->
   <div class="brand-gradient text-white text-center py-9 px-4 rounded-b-[2.5rem] shadow-lg">
     <h1 class="text-2xl md:text-3xl font-bold tracking-tight mb-2">उत्तर प्रदेश स्वास्थ्य विभाग</h1>
     <p class="text-[15px] md:text-base font-medium opacity-90 mb-4">
@@ -31,9 +36,13 @@
     </div>
   </div>
 
+  <!-- ==========================================
+       MAIN FILTER DASHBOARD CARD
+       ========================================== -->
   <div class="max-w-md mx-auto -mt-6 px-4">
     <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
       
+      <!-- Facility Selection Dropdown -->
       <div class="mb-4">
         <label class="block text-[13px] font-bold text-gray-500 tracking-wider uppercase mb-2">
           SELECT LABORATORY FACILITY / प्रयोगशाला इकाई का चयन करें
@@ -43,16 +52,20 @@
         </select>
       </div>
 
+      <!-- Test Search Input -->
       <div>
         <label class="block text-[13px] font-bold text-gray-500 tracking-wider uppercase mb-2">
           SEARCH DIAGNOSTIC TEST / जांच का नाम खोजें
         </label>
-        <input type="text" id="test-search" placeholder="Type shorthand or name (e.g. TLC, Hb, Sugar)..." 
+        <input type="text" id="test-search" placeholder="Search by English or Hindi name..." 
                class="w-full bg-gray-50 border border-gray-300 text-gray-900 rounded-xl px-4 py-3 text-[15px] focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out" disabled>
       </div>
 
     </div>
 
+    <!-- ==========================================
+         RENDERED STATUS BOARD/CONTAINER
+         ========================================== -->
     <div id="status-container" class="space-y-4">
       <div id="selection-prompt" class="bg-white rounded-2xl p-8 text-center shadow-md border border-dashed border-gray-200">
         <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -68,6 +81,7 @@
         </p>
       </div>
 
+      <!-- Connecting Loader -->
       <div id="connection-loader" class="hidden bg-white rounded-2xl p-8 text-center shadow-md">
         <h3 class="text-xl font-bold text-gray-800 mb-2">Connecting...</h3>
         <span class="inline-flex items-center px-4 py-2 rounded-full text-[15px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
@@ -82,11 +96,85 @@
 
   </div>
 
+  <!-- ==========================================
+       FRONT-END APPLICATION ARCHITECTURE
+       ========================================== -->
   <script>
-    const MASTER_TESTS = [
-      "Hemoglobin (Hb)", "TLC", "DLC", "RBC Count", "Platelet Count", 
-      "Blood Sugar (Fasting)", "Blood Sugar (Random)", "Serum Bilirubin", 
-      "SGOT", "SGPT", "Widal Test", "Malaria Card Test", "Urine Routine"
+    // Comprehensive list of all 73 laboratory tests with bilingual translation properties
+    const MASTER_73_TESTS = [
+      { en: "Hemoglobin", hi: "हीमोग्लोबिन" },
+      { en: "Hemoglobin (Hb)", hi: "हीमोग्लोबिन" },
+      { en: "Total leucocyte count", hi: "कुल ल्यूकोसाइट काउंट (TLC)" },
+      { en: "TLC", hi: "कुल ल्यूकोसाइट काउंट (TLC)" },
+      { en: "DLC", hi: "डिफरेंशियल ल्यूकोसाइट काउंट (DLC)" },
+      { en: "Differential Leucocyte Count", hi: "डिफरेंशियल ल्यूकोसाइट काउंट (DLC)" },
+      { en: "RBC Count", hi: "आरबीसी काउंट" },
+      { en: "Platelet Count", hi: "प्लेटलेट काउंट" },
+      { en: "PCV", hi: "पीसीवी (Packed Cell Volume)" },
+      { en: "MCV", hi: "एमसीवी (Mean Corpuscular Volume)" },
+      { en: "MCH", hi: "एमसीएच" },
+      { en: "MCHC", hi: "एमसीएचसी" },
+      { en: "Reticulocyte Count", hi: "रेटिकुलोसाइट काउंट" },
+      { en: "ESR", hi: "ईएसआर (Erythrocyte Sedimentation Rate)" },
+      { en: "Blood Group", hi: "रक्त समूह (ABO & Rh)" },
+      { en: "Peripheral Smear", hi: "पेरिफेरल स्मीयर परीक्षण" },
+      { en: "BT/CT", hi: "ब्लडिंग टाइम / क्लॉटिंग टाइम" },
+      { en: "Urine Routine", hi: "मूत्र नियमित परीक्षण" },
+      { en: "Urine routine test", hi: "मूत्र नियमित परीक्षण" },
+      { en: "Urine Microscopic", hi: "मूत्र सूक्ष्मदर्शी परीक्षण" },
+      { en: "Stool Routine", hi: "मल नियमित परीक्षण" },
+      { en: "Stool Microscopic", hi: "मल सूक्ष्मदर्शी परीक्षण" },
+      { en: "CSF Analysis", hi: "सीएसएफ विश्लेषण (Cerebrospinal Fluid)" },
+      { en: "Semen Analysis", hi: "वीर्य विश्लेषण" },
+      { en: "Sputum AFB", hi: "बलगम एएफबी (TB के लिए)" },
+      { en: "Gram Stain", hi: "ग्राम अभिरंजन" },
+      { en: "Albert Stain", hi: "अल्बर्ट अभिरंजन" },
+      { en: "Skin Smear Leishmania", hi: "त्वचा स्मीयर लीशमैनिया" },
+      { en: "Blood sugar", hi: "रक्त शर्करा (Blood Sugar)" },
+      { en: "Blood Sugar (Fasting)", hi: "रक्त शर्करा (Fasting)" },
+      { en: "Blood Sugar (Random)", hi: "रक्त शर्करा (Random)" },
+      { en: "Blood Sugar (Post Prandial)", hi: "रक्त शर्करा (PP)" },
+      { en: "Glucose tolerance test (GTT)", hi: "ग्लूकोज टॉलरेंस टेस्ट" },
+      { en: "HbA1c", hi: "एचबीए1सी (HbA1c)" },
+      { en: "Blood Urea", hi: "रक्त यूरिया" },
+      { en: "Serum Creatinine", hi: "सीरम क्रिएटिनिन" },
+      { en: "Serum Uric Acid", hi: "सीरम यूरिक एसिड" },
+      { en: "Serum Bilirubin", hi: "सीरम बिलीरुबिन" },
+      { en: "SGOT", hi: "एसजीओटी (SGOT)" },
+      { en: "SGPT", hi: "एसजीपीटी (SGPT)" },
+      { en: "Serum Alkaline Phosphatase", hi: "सीरम अल्कलाइन फॉस्फेट" },
+      { en: "Serum Total Protein", hi: "सीरम कुल प्रोटीन" },
+      { en: "Serum Albumin", hi: "सीरम एल्ब्यूमिन" },
+      { en: "Serum Cholesterol", hi: "सीरम कोलेस्ट्रॉल" },
+      { en: "Serum Triglycerides", hi: "सीरम ट्राइग्लिसराइड्स" },
+      { en: "HDL Cholesterol", hi: "एचडीएल कोलेस्ट्रॉल" },
+      { en: "LDL Cholesterol", hi: "एलडीएल कोलेस्ट्रॉल" },
+      { en: "VLDL Cholesterol", hi: "वीएलडीएल कोलेस्ट्रॉल" },
+      { en: "Serum Calcium", hi: "सीरम कैल्शियम" },
+      { en: "Serum Phosphorus", hi: "सीरम फास्फोरस" },
+      { en: "Serum Electrolytes", hi: "सीरम इलेक्ट्रोलाइट्स (Na/K/Cl)" },
+      { en: "Serum Amylase", hi: "सीरम एमाइलेज" },
+      { en: "Serum Lipase", hi: "सीरम लाइपेज" },
+      { en: "Rheumatoid Factor (RF)", hi: "रुमेटोइड फैक्टर (RF)" },
+      { en: "CRP", hi: "सीआरपी (C-Reactive Protein)" },
+      { en: "ASO Titre", hi: "एएसओ टाइटर" },
+      { en: "Widal Test", hi: "विडाल टेस्ट (Typhoid)" },
+      { en: "Malaria Card Test", hi: "मलेरिया कार्ड टेस्ट" },
+      { en: "Dengue test", hi: "डेंगू परीक्षण" },
+      { en: "Dengue NS1/IgM", hi: "डेंगू एनएस1/आईजीएम" },
+      { en: "Chikungunya IgM", hi: "चिकनगुनिया आईजीएम" },
+      { en: "HIV Rapid", hi: "एचआईवी रैपिड टेस्ट" },
+      { en: "HBsAg Rapid", hi: "हेपेटाइटिस बी रैपिड टेस्ट" },
+      { en: "HCV Rapid", hi: "हेपेटाइटिस सी रैपिड टेस्ट" },
+      { en: "RPR/VDRL test", hi: "आरपीआर/वीडीआरएल टेस्ट (Syphilis)" },
+      { en: "HCG urine test", hi: "मूत्र गर्भावस्था परीक्षण (HCG)" },
+      { en: "Fluid analysis", hi: "तरल विश्लेषण (Fluid Analysis)" },
+      { en: "Drug overdose test", hi: "ड्रग ओवरडोज टेस्ट" },
+      { en: "Blood Culture", hi: "रक्त संवर्धन (Blood Culture)" },
+      { en: "Urine Culture", hi: "मूत्र संवर्धन (Urine Culture)" },
+      { en: "Stool Culture", hi: "मल संवर्धन (Stool Culture)" },
+      { en: "Thyroid Profile (T3 T4 TSH)", hi: "थायराइड प्रोफाइल (T3, T4, TSH)" },
+      { en: "Serum Iron", hi: "सीरम आयरन" }
     ];
 
     const DISTRICT_REGISTRY = {
@@ -171,38 +259,21 @@
       try {
         loader.classList.remove("hidden");
         const response = await fetch(dataUrl + '?nocache=' + new Date().getTime());
-        if (!response.ok) throw new Error("JSON payload missing or unavailable");
+        if (!response.ok) throw new Error("JSON payload missing");
         
         apiData = await response.json();
         loader.classList.add("hidden");
         document.getElementById("test-search").removeAttribute("disabled");
       } catch (err) {
-        console.error("Fetch Interrupted: Working in offline mode.", err);
+        console.error("Fetch Interrupted", err);
         loader.classList.add("hidden");
         document.getElementById("test-search").removeAttribute("disabled");
       }
     }
 
-    // Smart Mapping Engine to map JSON entries to Master Lists
-    function mapJsonToMasterTests(jsonKey) {
-      const key = jsonKey.toLowerCase().trim().replace(/\s+/g, '');
-      
-      if (key === "hemoglobin" || key === "hb") return ["Hemoglobin (Hb)"];
-      if (key === "totalleucocytecount" || key === "tlc") return ["TLC"];
-      if (key === "differentialleucocytecount" || key === "dlc") return ["DLC"];
-      if (key === "rbccount" || key === "rbc") return ["RBC Count"];
-      if (key === "plateletcount" || key === "platelet") return ["Platelet Count"];
-      if (key === "bloodsugar" || key === "sugar" || key === "bloodsugar(fasting)" || key === "bloodsugar(random)") {
-        return ["Blood Sugar (Fasting)", "Blood Sugar (Random)"];
-      }
-      if (key === "serumbilirubin" || key === "bilirubin") return ["Serum Bilirubin"];
-      if (key === "sgot") return ["SGOT"];
-      if (key === "sgpt") return ["SGPT"];
-      if (key === "widaltest" || key === "widal") return ["Widal Test"];
-      if (key === "malariacardtest" || key === "malaria") return ["Malaria Card Test"];
-      if (key === "urineroutinetest" || key === "urineroutine") return ["Urine Routine"];
-      
-      return []; 
+    // Normalized lookup engine to align raw sheet names with standard Master keys
+    function cleanCompareKey(str) {
+      return str.toLowerCase().trim().replace(/\s+/g, '').replace(/[^a-z0-9]/g, '');
     }
 
     function renderDashboard() {
@@ -237,135 +308,119 @@
       const facilityId = selectedFacilityObj.id;
       const facilityDisplay = selectedFacilityObj.display;
 
-      let subTextEn = "";
-      let subTextHi = "";
+      let subTextEn = "Showing status of all laboratory tests.";
+      let subTextHi = "सभी प्रयोगशाला परीक्षणों की अद्यतन स्थिति दिखाई जा रही है।";
       let borderClass = "border-gray-100";
       let testsListHTML = "";
 
-      let unavailableTestsList = [];
-      let availableTestsList = [];
-
       const exactDataKey = Object.keys(apiData).find(key => key.toLowerCase().trim() === facilityId.toLowerCase().trim());
+      const loggedDowntimes = exactDataKey ? (apiData[exactDataKey] || {}) : {};
 
-      if (exactDataKey) {
-        const loggedDowntimes = apiData[exactDataKey] || {};
-        const mappedUnavailableCore = new Set();
+      // Match each of our master tests directly to the parsed JSON database
+      let resolvedDataset = MASTER_73_TESTS.map(testObj => {
+        let matchedPayload = null;
 
-        Object.keys(loggedDowntimes).forEach(jsonKey => {
-          const detail = loggedDowntimes[jsonKey];
-          const mappedCoreArray = mapJsonToMasterTests(jsonKey);
-
-          if (mappedCoreArray.length > 0) {
-            mappedCoreArray.forEach(coreTest => {
-              mappedUnavailableCore.add(coreTest);
-              unavailableTestsList.push({
-                name: coreTest,
-                reasonEn: detail.reasonEn || "Unavailable",
-                reasonHi: detail.reasonHi || "अनुपलब्ध"
-              });
-            });
-          } else {
-            unavailableTestsList.push({
-              name: jsonKey, 
-              reasonEn: detail.reasonEn || "Unavailable",
-              reasonHi: detail.reasonHi || "अनुपलब्ध"
-            });
-          }
+        // Try fuzzy comparisons of test names in sheet payload
+        const matchKey = Object.keys(loggedDowntimes).find(jsonKey => {
+          const normJson = cleanCompareKey(jsonKey);
+          const normMasterEn = cleanCompareKey(testObj.en);
+          const normMasterHi = cleanCompareKey(testObj.hi);
+          
+          return normJson === normMasterEn || 
+                 normJson === normMasterHi || 
+                 normJson.includes(normMasterEn) || 
+                 normMasterEn.includes(normJson);
         });
 
-        MASTER_TESTS.forEach(testName => {
-          if (!mappedUnavailableCore.has(testName)) {
-            availableTestsList.push({ name: testName });
-          }
-        });
-
-        if (searchFilter !== "") {
-          unavailableTestsList = unavailableTestsList.filter(t => t.name.toLowerCase().includes(searchFilter));
-          availableTestsList = availableTestsList.filter(t => t.name.toLowerCase().includes(searchFilter));
+        if (matchKey) {
+          matchedPayload = loggedDowntimes[matchKey];
         }
 
-        const totalUnavailable = unavailableTestsList.length;
-        const totalAvailable = availableTestsList.length;
+        return {
+          enName: testObj.en,
+          hiName: testObj.hi,
+          isAvailable: !matchedPayload,
+          reasonEn: matchedPayload ? (matchedPayload.reasonEn || "Unavailable") : "",
+          reasonHi: matchedPayload ? (matchedPayload.reasonHi || "अनुपलब्ध") : ""
+        };
+      });
 
-        if (Object.keys(loggedDowntimes).length === 0) {
-          subTextEn = "All tests functioning normally.";
-          subTextHi = "सभी परीक्षण सामान्य रूप से संचालित हो रहे हैं।";
-          borderClass = "border-amber-200"; // Light operational alert highlight
-        } else {
-          subTextEn = `${totalUnavailable} test(s) currently suspended.`;
-          subTextHi = `${totalUnavailable} परीक्षण फिलहाल बाधित हैं।`;
-          borderClass = "border-red-200"; // Clear downtime warning box
+      // Remove redundant helper duplicates in master list (e.g., Hemoglobin vs Hemoglobin (Hb))
+      const uniqueDataset = [];
+      const seenNames = new Set();
+      resolvedDataset.forEach(item => {
+        const cleaned = item.enName.split('(')[0].trim().toLowerCase();
+        if (!seenNames.has(cleaned)) {
+          seenNames.add(cleaned);
+          uniqueDataset.push(item);
         }
+      });
 
-        let unavailableHTML = "";
-        let availableHTML = "";
+      // Apply User Search Query Filter
+      let filteredDataset = uniqueDataset;
+      if (searchFilter !== "") {
+        filteredDataset = uniqueDataset.filter(t => 
+          t.enName.toLowerCase().includes(searchFilter) || 
+          t.hiName.toLowerCase().includes(searchFilter)
+        );
+      }
 
-        if (unavailableTestsList.length > 0) {
-          unavailableHTML = `
-            <div class="mb-5">
-              <div class="flex items-center justify-between mb-2">
-                <h5 class="text-[13px] font-bold uppercase tracking-wider text-red-600">Unavailable Tests / अनुपलब्ध जांचें</h5>
-                <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-red-100 text-red-800 border border-red-200">
-                  Count: ${totalUnavailable}
-                </span>
-              </div>
-              <div class="bg-red-50/50 rounded-xl p-3 border border-red-100 space-y-2">
-                ${unavailableTestsList.map(t => `
-                  <div class="flex justify-between items-center py-2 border-b border-dashed border-red-100 last:border-0 last:pb-0">
-                    <span class="font-semibold text-[15px] text-gray-800">${t.name}</span>
-                    <div class="text-right">
-                      <span class="text-[13px] font-bold text-red-600 block">${t.reasonEn}</span>
-                      <span class="text-[11px] font-medium text-red-500 block">${t.reasonHi}</span>
+      const totalActiveDowntimes = uniqueDataset.filter(t => !t.isAvailable).length;
+
+      if (totalActiveDowntimes > 0) {
+        subTextEn = `${totalActiveDowntimes} diagnostic test(s) currently suspended.`;
+        subTextHi = `${totalActiveDowntimes} परीक्षण फिलहाल बाधित हैं।`;
+        borderClass = "border-red-200";
+      } else {
+        subTextEn = "All laboratory diagnostic tests are functioning normally.";
+        subTextHi = "सभी प्रयोगशाला नैदानिक परीक्षण सुचारू रूप से कार्यरत हैं।";
+        borderClass = "border-emerald-200";
+      }
+
+      testsListHTML = `
+        <div class="mt-6 border-t border-gray-100 pt-4">
+          <div class="flex items-center justify-between mb-4">
+            <h5 class="text-[13px] font-bold uppercase tracking-wider text-blue-700">Test Directory / जांच सूची</h5>
+            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
+              Total: ${filteredDataset.length}
+            </span>
+          </div>
+          
+          <div class="space-y-3">
+            ${filteredDataset.map(t => {
+              if (t.isAvailable) {
+                return `
+                  <div class="flex justify-between items-center py-3 px-3.5 bg-emerald-50/20 border border-emerald-100 rounded-xl">
+                    <div>
+                      <span class="font-bold text-[15px] text-gray-800 block">${t.enName}</span>
+                      <span class="text-[12px] font-semibold text-gray-500 block">${t.hiName}</span>
                     </div>
-                  </div>
-                `).join("")}
-              </div>
-            </div>
-          `;
-        }
-
-        if (availableTestsList.length > 0) {
-          availableHTML = `
-            <div>
-              <div class="flex items-center justify-between mb-2">
-                <h5 class="text-[13px] font-bold uppercase tracking-wider text-emerald-600">Available Tests / उपलब्ध जांचें</h5>
-                <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-                  Count: ${totalAvailable}
-                </span>
-              </div>
-              <div class="bg-emerald-50/30 rounded-xl p-3 border border-emerald-100 space-y-2">
-                ${availableTestsList.map(t => `
-                  <div class="flex justify-between items-center py-2 border-b border-dashed border-emerald-100/50 last:border-0 last:pb-0">
-                    <span class="font-semibold text-[15px] text-gray-800">${t.name}</span>
-                    <span class="px-2 py-0.5 text-[11px] font-bold rounded bg-emerald-100 text-emerald-800">
+                    <span class="px-2.5 py-1 text-[11px] font-bold rounded bg-emerald-100 text-emerald-800 border border-emerald-200 whitespace-nowrap">
                       Available / उपलब्ध
                     </span>
                   </div>
-                `).join("")}
-              </div>
-            </div>
-          `;
-        }
-
-        testsListHTML = `
-          <div class="mt-6 border-t border-gray-100 pt-4 space-y-6">
-            ${unavailableHTML}
-            ${availableHTML}
+                `;
+              } else {
+                return `
+                  <div class="flex justify-between items-start gap-4 py-3 px-3.5 bg-red-50/40 border border-red-100 rounded-xl">
+                    <div>
+                      <span class="font-bold text-[15px] text-gray-800 block">${t.enName}</span>
+                      <span class="text-[12px] font-semibold text-gray-500 block">${t.hiName}</span>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                      <span class="px-2.5 py-1 text-[11px] font-bold rounded bg-red-100 text-red-800 border border-red-200 block mb-1.5 text-center">
+                        Unavailable / अनुपलब्ध
+                      </span>
+                      <span class="text-[13px] font-bold text-red-600 block leading-tight">${t.reasonEn}</span>
+                      <span class="text-[11px] font-medium text-red-500 block leading-normal mt-0.5">${t.reasonHi}</span>
+                    </div>
+                  </div>
+                `;
+              }
+            }).join("")}
           </div>
-        `;
-
-      } else {
-        subTextEn = "No daily update packet received.";
-        subTextHi = "आज कोई दैनिक अपडेट प्राप्त नहीं हुआ।";
-        borderClass = "border-gray-200";
-        
-        testsListHTML = `
-          <div class="mt-4 bg-gray-50 border border-gray-200 rounded-xl p-4 text-center text-[14px]">
-            <p class="text-gray-500 font-medium">Please check back in later or contact local facility administration.</p>
-            <p class="text-gray-400 mt-0.5">कृपया बाद में पुनः जांच करें या स्थानीय चिकित्सा प्रशासन से संपर्क करें।</p>
-          </div>
-        `;
-      }
+        </div>
+      `;
 
       const card = document.createElement("div");
       card.className = `bg-white rounded-2xl shadow-md p-5 text-[15px] border ${borderClass}`;
