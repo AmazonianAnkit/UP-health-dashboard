@@ -83,7 +83,7 @@
   </div>
 
   <script>
-    // Exact 73-test array from the official list image
+    // Exact 73-test array matching the uploaded list
     const MASTER_73_TESTS = [
       { id: 1, en: "Hemoglobin", hi: "हीमोग्लोबिन" },
       { id: 2, en: "Total leucocyte count", hi: "TLC / कुल ल्यूकोसाइट काउंट" },
@@ -254,16 +254,15 @@
       }
     }
 
-    // Helper to completely clean strings for robust matching logic
+    // Helper to clean strings for robust matching logic
     function cleanCompareKey(str) {
       return str.toLowerCase().trim().replace(/\s+/g, '').replace(/[^a-z0-9]/g, '');
     }
 
-    // Comprehensive translation logic linking shorthands to their official # IDs
+    // Maps shorthand strings straight to their official master array IDs
     function getMatchedTestId(jsonKey) {
       const keyCleaned = cleanCompareKey(jsonKey);
 
-      // Explicit Alias Reductions (Maps shorthands straight to their exact Master list IDs)
       if (keyCleaned === "hb" || keyCleaned === "hemoglobin") return 1;
       if (keyCleaned === "tlc" || keyCleaned === "totalleucocytecount") return 2;
       if (keyCleaned === "dlc" || keyCleaned === "differentialleucocytecount") return 3;
@@ -275,7 +274,6 @@
       if (keyCleaned === "gtt" || keyCleaned === "glucosetolerancetest") return 36;
       if (keyCleaned === "totalbilirubin") return 37;
 
-      // Fallback fallback loops
       for (let i = 0; i < MASTER_73_TESTS.length; i++) {
         const master = MASTER_73_TESTS[i];
         if (cleanCompareKey(master.en) === keyCleaned || cleanCompareKey(master.hi) === keyCleaned) {
@@ -325,7 +323,7 @@
       const exactDataKey = Object.keys(apiData).find(key => key.toLowerCase().trim() === facilityId.toLowerCase().trim());
       const loggedDowntimes = exactDataKey ? (apiData[exactDataKey] || {}) : {};
 
-      // Map dynamic downtime properties to the static master index
+      // Map down times to master list indices
       const mappedDowntimes = {};
       Object.keys(loggedDowntimes).forEach(jsonKey => {
         const targetId = getMatchedTestId(jsonKey);
@@ -334,7 +332,7 @@
         }
       });
 
-      // Construct output dataset
+      // Construct resolved bilingual list
       let resolvedDataset = MASTER_73_TESTS.map(testObj => {
         const matchedPayload = mappedDowntimes[testObj.id];
         return {
@@ -347,7 +345,7 @@
         };
       });
 
-      // Apply Search Filter Query
+      // Apply Search filter
       let filteredDataset = resolvedDataset;
       if (searchFilter !== "") {
         filteredDataset = resolvedDataset.filter(t => 
@@ -356,11 +354,13 @@
         );
       }
 
-      const totalActiveDowntimes = resolvedDataset.filter(t => !t.isAvailable).length;
+      // Calculate exact live totals
+      const totalUnavailable = resolvedDataset.filter(t => !t.isAvailable).length;
+      const totalAvailable = resolvedDataset.filter(t => t.isAvailable).length;
 
-      if (totalActiveDowntimes > 0) {
-        subTextEn = `${totalActiveDowntimes} diagnostic test(s) currently suspended.`;
-        subTextHi = `${totalActiveDowntimes} परीक्षण फिलहाल बाधित हैं।`;
+      if (totalUnavailable > 0) {
+        subTextEn = `${totalUnavailable} diagnostic test(s) currently suspended.`;
+        subTextHi = `${totalUnavailable} परीक्षण फिलहाल बाधित हैं।`;
         borderClass = "border-red-200";
       } else {
         subTextEn = "All laboratory diagnostic tests are functioning normally.";
@@ -370,10 +370,24 @@
 
       testsListHTML = `
         <div class="mt-6 border-t border-gray-100 pt-4">
+          
+          <div class="grid grid-cols-2 gap-3 mb-5">
+            <div class="bg-emerald-50/50 border border-emerald-200 rounded-xl p-3 text-center">
+              <span class="block text-emerald-800 font-bold text-lg leading-tight">${totalAvailable}</span>
+              <span class="block text-[11px] font-bold text-emerald-700 uppercase tracking-wider mt-0.5">Available Tests</span>
+              <span class="block text-[10px] font-semibold text-emerald-600">उपलब्ध जांचें</span>
+            </div>
+            <div class="bg-red-50/50 border border-red-200 rounded-xl p-3 text-center">
+              <span class="block text-red-800 font-bold text-lg leading-tight">${totalUnavailable}</span>
+              <span class="block text-[11px] font-bold text-red-700 uppercase tracking-wider mt-0.5">Unavailable Tests</span>
+              <span class="block text-[10px] font-semibold text-red-600">अनुपलब्ध जांचें</span>
+            </div>
+          </div>
+
           <div class="flex items-center justify-between mb-4">
             <h5 class="text-[13px] font-bold uppercase tracking-wider text-blue-700">Test Directory / जांच सूची</h5>
             <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200">
-              Total: ${filteredDataset.length}
+              Filtered: ${filteredDataset.length}
             </span>
           </div>
           
@@ -383,7 +397,6 @@
                 return `
                   <div class="flex justify-between items-center py-3 px-3.5 bg-emerald-50/20 border border-emerald-100 rounded-xl">
                     <div>
-                      <span class="text-xs font-bold text-emerald-700 block mb-0.5">Test #${t.id}</span>
                       <span class="font-bold text-[15px] text-gray-800 block leading-tight">${t.enName}</span>
                       <span class="text-[12px] font-semibold text-gray-500 block mt-0.5">${t.hiName}</span>
                     </div>
@@ -396,7 +409,6 @@
                 return `
                   <div class="flex justify-between items-start gap-4 py-3 px-3.5 bg-red-50/40 border border-red-100 rounded-xl">
                     <div>
-                      <span class="text-xs font-bold text-red-700 block mb-0.5">Test #${t.id}</span>
                       <span class="font-bold text-[15px] text-gray-800 block leading-tight">${t.enName}</span>
                       <span class="text-[12px] font-semibold text-gray-500 block mt-0.5">${t.hiName}</span>
                     </div>
