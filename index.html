@@ -5,10 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Live Laboratory Test Availability Status Tracker</title>
   
-  <!-- Tailwind CSS for modern, fast styling -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -23,9 +21,6 @@
 </head>
 <body class="text-gray-800 antialiased min-h-screen pb-12 text-[15px]">
 
-  <!-- ==========================================
-       HEADER & MAIN BRAND BANNER
-       ========================================== -->
   <div class="brand-gradient text-white text-center py-9 px-4 rounded-b-[2.5rem] shadow-lg">
     <h1 class="text-2xl md:text-3xl font-bold tracking-tight mb-2">उत्तर प्रदेश स्वास्थ्य विभाग</h1>
     <p class="text-[15px] md:text-base font-medium opacity-90 mb-4">
@@ -36,13 +31,9 @@
     </div>
   </div>
 
-  <!-- ==========================================
-       MAIN FILTER DASHBOARD CARD
-       ========================================== -->
   <div class="max-w-md mx-auto -mt-6 px-4">
     <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
       
-      <!-- Facility Selection Dropdown -->
       <div class="mb-4">
         <label class="block text-[13px] font-bold text-gray-500 tracking-wider uppercase mb-2">
           SELECT LABORATORY FACILITY / प्रयोगशाला इकाई का चयन करें
@@ -52,7 +43,6 @@
         </select>
       </div>
 
-      <!-- Test Search Input -->
       <div>
         <label class="block text-[13px] font-bold text-gray-500 tracking-wider uppercase mb-2">
           SEARCH DIAGNOSTIC TEST / जांच का नाम खोजें
@@ -63,9 +53,6 @@
 
     </div>
 
-    <!-- ==========================================
-         RENDERED STATUS BOARD/CONTAINER
-         ========================================== -->
     <div id="status-container" class="space-y-4">
       <div id="selection-prompt" class="bg-white rounded-2xl p-8 text-center shadow-md border border-dashed border-gray-200">
         <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -81,7 +68,6 @@
         </p>
       </div>
 
-      <!-- Connecting Loader -->
       <div id="connection-loader" class="hidden bg-white rounded-2xl p-8 text-center shadow-md">
         <h3 class="text-xl font-bold text-gray-800 mb-2">Connecting...</h3>
         <span class="inline-flex items-center px-4 py-2 rounded-full text-[15px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">
@@ -96,85 +82,82 @@
 
   </div>
 
-  <!-- ==========================================
-       FRONT-END APPLICATION ARCHITECTURE
-       ========================================== -->
   <script>
-    // Comprehensive list of all 73 laboratory tests with bilingual translation properties
+    // Exact 73-test array from the official list image
     const MASTER_73_TESTS = [
-      { en: "Hemoglobin", hi: "हीमोग्लोबिन" },
-      { en: "Hemoglobin (Hb)", hi: "हीमोग्लोबिन" },
-      { en: "Total leucocyte count", hi: "कुल ल्यूकोसाइट काउंट (TLC)" },
-      { en: "TLC", hi: "कुल ल्यूकोसाइट काउंट (TLC)" },
-      { en: "DLC", hi: "डिफरेंशियल ल्यूकोसाइट काउंट (DLC)" },
-      { en: "Differential Leucocyte Count", hi: "डिफरेंशियल ल्यूकोसाइट काउंट (DLC)" },
-      { en: "RBC Count", hi: "आरबीसी काउंट" },
-      { en: "Platelet Count", hi: "प्लेटलेट काउंट" },
-      { en: "PCV", hi: "पीसीवी (Packed Cell Volume)" },
-      { en: "MCV", hi: "एमसीवी (Mean Corpuscular Volume)" },
-      { en: "MCH", hi: "एमसीएच" },
-      { en: "MCHC", hi: "एमसीएचसी" },
-      { en: "Reticulocyte Count", hi: "रेटिकुलोसाइट काउंट" },
-      { en: "ESR", hi: "ईएसआर (Erythrocyte Sedimentation Rate)" },
-      { en: "Blood Group", hi: "रक्त समूह (ABO & Rh)" },
-      { en: "Peripheral Smear", hi: "पेरिफेरल स्मीयर परीक्षण" },
-      { en: "BT/CT", hi: "ब्लडिंग टाइम / क्लॉटिंग टाइम" },
-      { en: "Urine Routine", hi: "मूत्र नियमित परीक्षण" },
-      { en: "Urine routine test", hi: "मूत्र नियमित परीक्षण" },
-      { en: "Urine Microscopic", hi: "मूत्र सूक्ष्मदर्शी परीक्षण" },
-      { en: "Stool Routine", hi: "मल नियमित परीक्षण" },
-      { en: "Stool Microscopic", hi: "मल सूक्ष्मदर्शी परीक्षण" },
-      { en: "CSF Analysis", hi: "सीएसएफ विश्लेषण (Cerebrospinal Fluid)" },
-      { en: "Semen Analysis", hi: "वीर्य विश्लेषण" },
-      { en: "Sputum AFB", hi: "बलगम एएफबी (TB के लिए)" },
-      { en: "Gram Stain", hi: "ग्राम अभिरंजन" },
-      { en: "Albert Stain", hi: "अल्बर्ट अभिरंजन" },
-      { en: "Skin Smear Leishmania", hi: "त्वचा स्मीयर लीशमैनिया" },
-      { en: "Blood sugar", hi: "रक्त शर्करा (Blood Sugar)" },
-      { en: "Blood Sugar (Fasting)", hi: "रक्त शर्करा (Fasting)" },
-      { en: "Blood Sugar (Random)", hi: "रक्त शर्करा (Random)" },
-      { en: "Blood Sugar (Post Prandial)", hi: "रक्त शर्करा (PP)" },
-      { en: "Glucose tolerance test (GTT)", hi: "ग्लूकोज टॉलरेंस टेस्ट" },
-      { en: "HbA1c", hi: "एचबीए1सी (HbA1c)" },
-      { en: "Blood Urea", hi: "रक्त यूरिया" },
-      { en: "Serum Creatinine", hi: "सीरम क्रिएटिनिन" },
-      { en: "Serum Uric Acid", hi: "सीरम यूरिक एसिड" },
-      { en: "Serum Bilirubin", hi: "सीरम बिलीरुबिन" },
-      { en: "SGOT", hi: "एसजीओटी (SGOT)" },
-      { en: "SGPT", hi: "एसजीपीटी (SGPT)" },
-      { en: "Serum Alkaline Phosphatase", hi: "सीरम अल्कलाइन फॉस्फेट" },
-      { en: "Serum Total Protein", hi: "सीरम कुल प्रोटीन" },
-      { en: "Serum Albumin", hi: "सीरम एल्ब्यूमिन" },
-      { en: "Serum Cholesterol", hi: "सीरम कोलेस्ट्रॉल" },
-      { en: "Serum Triglycerides", hi: "सीरम ट्राइग्लिसराइड्स" },
-      { en: "HDL Cholesterol", hi: "एचडीएल कोलेस्ट्रॉल" },
-      { en: "LDL Cholesterol", hi: "एलडीएल कोलेस्ट्रॉल" },
-      { en: "VLDL Cholesterol", hi: "वीएलडीएल कोलेस्ट्रॉल" },
-      { en: "Serum Calcium", hi: "सीरम कैल्शियम" },
-      { en: "Serum Phosphorus", hi: "सीरम फास्फोरस" },
-      { en: "Serum Electrolytes", hi: "सीरम इलेक्ट्रोलाइट्स (Na/K/Cl)" },
-      { en: "Serum Amylase", hi: "सीरम एमाइलेज" },
-      { en: "Serum Lipase", hi: "सीरम लाइपेज" },
-      { en: "Rheumatoid Factor (RF)", hi: "रुमेटोइड फैक्टर (RF)" },
-      { en: "CRP", hi: "सीआरपी (C-Reactive Protein)" },
-      { en: "ASO Titre", hi: "एएसओ टाइटर" },
-      { en: "Widal Test", hi: "विडाल टेस्ट (Typhoid)" },
-      { en: "Malaria Card Test", hi: "मलेरिया कार्ड टेस्ट" },
-      { en: "Dengue test", hi: "डेंगू परीक्षण" },
-      { en: "Dengue NS1/IgM", hi: "डेंगू एनएस1/आईजीएम" },
-      { en: "Chikungunya IgM", hi: "चिकनगुनिया आईजीएम" },
-      { en: "HIV Rapid", hi: "एचआईवी रैपिड टेस्ट" },
-      { en: "HBsAg Rapid", hi: "हेपेटाइटिस बी रैपिड टेस्ट" },
-      { en: "HCV Rapid", hi: "हेपेटाइटिस सी रैपिड टेस्ट" },
-      { en: "RPR/VDRL test", hi: "आरपीआर/वीडीआरएल टेस्ट (Syphilis)" },
-      { en: "HCG urine test", hi: "मूत्र गर्भावस्था परीक्षण (HCG)" },
-      { en: "Fluid analysis", hi: "तरल विश्लेषण (Fluid Analysis)" },
-      { en: "Drug overdose test", hi: "ड्रग ओवरडोज टेस्ट" },
-      { en: "Blood Culture", hi: "रक्त संवर्धन (Blood Culture)" },
-      { en: "Urine Culture", hi: "मूत्र संवर्धन (Urine Culture)" },
-      { en: "Stool Culture", hi: "मल संवर्धन (Stool Culture)" },
-      { en: "Thyroid Profile (T3 T4 TSH)", hi: "थायराइड प्रोफाइल (T3, T4, TSH)" },
-      { en: "Serum Iron", hi: "सीरम आयरन" }
+      { id: 1, en: "Hemoglobin", hi: "हीमोग्लोबिन" },
+      { id: 2, en: "Total leucocyte count", hi: "TLC / कुल ल्यूकोसाइट काउंट" },
+      { id: 3, en: "Differential leucocyte count", hi: "DLC / डिफरेंशियल ल्यूकोसाइट काउंट" },
+      { id: 4, en: "Platelet count", hi: "प्लेटलेट काउंट" },
+      { id: 5, en: "Complete blood count", hi: "कम्प्लीट ब्लड काउंट (CBC)" },
+      { id: 6, en: "Erythrocyte sedimentation rate (ESR)", hi: "ईएसआर (ESR)" },
+      { id: 7, en: "Blood group and Rh typing, cross matching", hi: "रक्त समूह (ABO & Rh) एवं क्रॉस मैचिंग" },
+      { id: 8, en: "Peripheral blood film", hi: "पेरिफेरल ब्लड फिल्म" },
+      { id: 9, en: "Reticulocyte count", hi: "रेटिकुलोसाइट काउंट" },
+      { id: 10, en: "Absolute eosinophil count", hi: "एब्सोल्यूट इओसिनोफिल काउंट (AEC)" },
+      { id: 11, en: "Bleeding time and clotting time", hi: "ब्लीडिंग और क्लॉटिंग टाइम (BT/CT)" },
+      { id: 12, en: "Sickle cell screening test", hi: "सिकल सेल स्क्रीनिंग टेस्ट" },
+      { id: 13, en: "Sickle cell strip test", hi: "सिकल सेल स्ट्रिप टेस्ट" },
+      { id: 14, en: "Thalassemia screening", hi: "थैलेसीमिया स्क्रीनिंग" },
+      { id: 15, en: "DCT for Hb electrophoresis", hi: "डीसीटी / एचबी इलेक्ट्रोफोरेसिस" },
+      { id: 16, en: "G6PD enzyme deficiency test", hi: "जी6पीडी एंजाइम कमी परीक्षण" },
+      { id: 17, en: "MP slide method", hi: "मलेरिया परजीवी (MP) स्लाइड विधि" },
+      { id: 18, en: "Malaria rapid test", hi: "मलेरिया रैपिड टेस्ट" },
+      { id: 19, en: "Prothrombin Time (PT) and INR", hi: "प्रोथ्रोम्बिन टाइम (PT) और INR" },
+      { id: 20, en: "Activated partial thromboplastin time (APTT)", hi: "एपीटीटी (APTT)" },
+      { id: 21, en: "HCG urine test", hi: "मूत्र गर्भावस्था परीक्षण (HCG)" },
+      { id: 22, en: "Urine routine test", hi: "मूत्र नियमित परीक्षण" },
+      { id: 23, en: "Urine microscopy", hi: "मूत्र सूक्ष्मदर्शी परीक्षण" },
+      { id: 24, en: "Urine for microalbumin", hi: "मूत्र माइक्रोएल्ब्यूमिन परीक्षण" },
+      { id: 25, en: "Urine for creatinine and ACR", hi: "मूत्र क्रिएटिनिन और एसीआर (ACR)" },
+      { id: 26, en: "Stool for ova and cyst", hi: "मल में ओवा और सिस्ट परीक्षण" },
+      { id: 27, en: "Stool for occult blood", hi: "मल में गुप्त रक्त परीक्षण" },
+      { id: 28, en: "Dengue test", hi: "डेंगू परीक्षण" },
+      { id: 29, en: "RPR/VDRL test", hi: "आरपीआर/वीडीआरएल टेस्ट (Syphilis)" },
+      { id: 30, en: "HIV test", hi: "एचआईवी परीक्षण" },
+      { id: 31, en: "HBsAg test", hi: "हेपेटाइटिस बी परीक्षण (HBsAg)" },
+      { id: 32, en: "HCV test", hi: "हेपेटाइटिस सी परीक्षण (HCV)" },
+      { id: 33, en: "Sputum for AFB", hi: "बलगम एएफबी परीक्षण (TB)" },
+      { id: 34, en: "Typhoid test (IgM)", hi: "टाइफाइड परीक्षण (IgM)" },
+      { id: 35, en: "Blood sugar", hi: "रक्त शर्करा (Blood Sugar)" },
+      { id: 36, en: "Glucose tolerance test (GTT)", hi: "ग्लूकोज टॉलरेंस टेस्ट (GTT)" },
+      { id: 37, en: "Total bilirubin", hi: "कुल बिलीरुबिन" },
+      { id: 38, en: "Direct & indirect bilirubin", hi: "प्रत्यक्ष एवं अप्रत्यक्ष बिलीरुबिन" },
+      { id: 39, en: "Serum creatinine", hi: "सीरम क्रिएटिनिन" },
+      { id: 40, en: "Blood urea", hi: "ब्लड यूरिया" },
+      { id: 41, en: "SGPT", hi: "एसजीपीटी (SGPT)" },
+      { id: 42, en: "SGOT", hi: "एसजीओटी (SGOT)" },
+      { id: 43, en: "Alkaline phosphatase", hi: "अल्कलाइन फॉस्फेट" },
+      { id: 44, en: "Total protein", hi: "कुल प्रोटीन" },
+      { id: 45, en: "Albumin & A/G ratio", hi: "एल्ब्यूमिन और ए/जी अनुपात" },
+      { id: 46, en: "Globulin", hi: "ग्लोबुलिन" },
+      { id: 47, en: "Total cholesterol", hi: "कुल कोलेस्ट्रॉल" },
+      { id: 48, en: "Triglycerides", hi: "ट्राइग्लिसराइड्स" },
+      { id: 49, en: "VLDL", hi: "वीएलडीएल (VLDL)" },
+      { id: 50, en: "HDL", hi: "एचडीएल (HDL)" },
+      { id: 51, en: "LDL", hi: "एलडीएल (LDL)" },
+      { id: 52, en: "Uric acid", hi: "यूरिक एसिड" },
+      { id: 53, en: "HbA1c", hi: "एचबीए1सी (HbA1c)" },
+      { id: 54, en: "Serum calcium", hi: "सीरम कैल्शियम" },
+      { id: 55, en: "Wet mount & Gram stain", hi: "वेट माउंट और ग्राम स्टेन" },
+      { id: 56, en: "Gram staining", hi: "ग्राम स्टेनिंग" },
+      { id: 57, en: "VIA test", hi: "वीआईए परीक्षण" },
+      { id: 58, en: "K39 for Kala Azar", hi: "काला जार हेतु K39 परीक्षण" },
+      { id: 59, en: "Filaria test", hi: "फाइलेरिया परीक्षण" },
+      { id: 60, en: "TB Mantoux", hi: "टीबी मैनटॉक्स परीक्षण (Mantoux)" },
+      { id: 61, en: "Troponin I", hi: "ट्रोपोनिन आई" },
+      { id: 62, en: "CRP (Quantitative)", hi: "सीआरपी मात्रात्मक (CRP)" },
+      { id: 63, en: "Pap smear", hi: "पैप स्मीयर परीक्षण" },
+      { id: 64, en: "CBNAAT", hi: "सीबीनाट परीक्षण (CBNAAT)" },
+      { id: 65, en: "Rapid test for cholera", hi: "हैजा रैपिड टेस्ट" },
+      { id: 66, en: "CSF analysis", hi: "सीएसएफ विश्लेषण" },
+      { id: 67, en: "Fluid analysis", hi: "फ्लूइड विश्लेषण (तरल जांच)" },
+      { id: 68, en: "Amylase", hi: "एमाइलेज" },
+      { id: 69, en: "Iron", hi: "आयरन" },
+      { id: 70, en: "TIBC", hi: "टीआईबीसी (TIBC)" },
+      { id: 71, en: "LDH", hi: "एलडीएच (LDH)" },
+      { id: 72, en: "24 hr urinary protein", hi: "24 घंटे मूत्र प्रोटीन परीक्षण" },
+      { id: 73, en: "Drug overdose test", hi: "ड्रग ओवरडोज टेस्ट" }
     ];
 
     const DISTRICT_REGISTRY = {
@@ -271,9 +254,35 @@
       }
     }
 
-    // Normalized lookup engine to align raw sheet names with standard Master keys
+    // Helper to completely clean strings for robust matching logic
     function cleanCompareKey(str) {
       return str.toLowerCase().trim().replace(/\s+/g, '').replace(/[^a-z0-9]/g, '');
+    }
+
+    // Comprehensive translation logic linking shorthands to their official # IDs
+    function getMatchedTestId(jsonKey) {
+      const keyCleaned = cleanCompareKey(jsonKey);
+
+      // Explicit Alias Reductions (Maps shorthands straight to their exact Master list IDs)
+      if (keyCleaned === "hb" || keyCleaned === "hemoglobin") return 1;
+      if (keyCleaned === "tlc" || keyCleaned === "totalleucocytecount") return 2;
+      if (keyCleaned === "dlc" || keyCleaned === "differentialleucocytecount") return 3;
+      if (keyCleaned === "esr" || keyCleaned === "erythrocytesedimentationrate") return 6;
+      if (keyCleaned === "btct" || keyCleaned === "bleedingtimeandclottingtime") return 11;
+      if (keyCleaned === "urineroutine" || keyCleaned === "urineroutinetest") return 22;
+      if (keyCleaned === "urinemicroscopy" || keyCleaned === "urinemicroscopic") return 23;
+      if (keyCleaned === "bloodsugar") return 35;
+      if (keyCleaned === "gtt" || keyCleaned === "glucosetolerancetest") return 36;
+      if (keyCleaned === "totalbilirubin") return 37;
+
+      // Fallback fallback loops
+      for (let i = 0; i < MASTER_73_TESTS.length; i++) {
+        const master = MASTER_73_TESTS[i];
+        if (cleanCompareKey(master.en) === keyCleaned || cleanCompareKey(master.hi) === keyCleaned) {
+          return master.id;
+        }
+      }
+      return null;
     }
 
     function renderDashboard() {
@@ -316,27 +325,20 @@
       const exactDataKey = Object.keys(apiData).find(key => key.toLowerCase().trim() === facilityId.toLowerCase().trim());
       const loggedDowntimes = exactDataKey ? (apiData[exactDataKey] || {}) : {};
 
-      // Match each of our master tests directly to the parsed JSON database
-      let resolvedDataset = MASTER_73_TESTS.map(testObj => {
-        let matchedPayload = null;
-
-        // Try fuzzy comparisons of test names in sheet payload
-        const matchKey = Object.keys(loggedDowntimes).find(jsonKey => {
-          const normJson = cleanCompareKey(jsonKey);
-          const normMasterEn = cleanCompareKey(testObj.en);
-          const normMasterHi = cleanCompareKey(testObj.hi);
-          
-          return normJson === normMasterEn || 
-                 normJson === normMasterHi || 
-                 normJson.includes(normMasterEn) || 
-                 normMasterEn.includes(normJson);
-        });
-
-        if (matchKey) {
-          matchedPayload = loggedDowntimes[matchKey];
+      // Map dynamic downtime properties to the static master index
+      const mappedDowntimes = {};
+      Object.keys(loggedDowntimes).forEach(jsonKey => {
+        const targetId = getMatchedTestId(jsonKey);
+        if (targetId !== null) {
+          mappedDowntimes[targetId] = loggedDowntimes[jsonKey];
         }
+      });
 
+      // Construct output dataset
+      let resolvedDataset = MASTER_73_TESTS.map(testObj => {
+        const matchedPayload = mappedDowntimes[testObj.id];
         return {
+          id: testObj.id,
           enName: testObj.en,
           hiName: testObj.hi,
           isAvailable: !matchedPayload,
@@ -345,27 +347,16 @@
         };
       });
 
-      // Remove redundant helper duplicates in master list (e.g., Hemoglobin vs Hemoglobin (Hb))
-      const uniqueDataset = [];
-      const seenNames = new Set();
-      resolvedDataset.forEach(item => {
-        const cleaned = item.enName.split('(')[0].trim().toLowerCase();
-        if (!seenNames.has(cleaned)) {
-          seenNames.add(cleaned);
-          uniqueDataset.push(item);
-        }
-      });
-
-      // Apply User Search Query Filter
-      let filteredDataset = uniqueDataset;
+      // Apply Search Filter Query
+      let filteredDataset = resolvedDataset;
       if (searchFilter !== "") {
-        filteredDataset = uniqueDataset.filter(t => 
+        filteredDataset = resolvedDataset.filter(t => 
           t.enName.toLowerCase().includes(searchFilter) || 
           t.hiName.toLowerCase().includes(searchFilter)
         );
       }
 
-      const totalActiveDowntimes = uniqueDataset.filter(t => !t.isAvailable).length;
+      const totalActiveDowntimes = resolvedDataset.filter(t => !t.isAvailable).length;
 
       if (totalActiveDowntimes > 0) {
         subTextEn = `${totalActiveDowntimes} diagnostic test(s) currently suspended.`;
@@ -392,8 +383,9 @@
                 return `
                   <div class="flex justify-between items-center py-3 px-3.5 bg-emerald-50/20 border border-emerald-100 rounded-xl">
                     <div>
-                      <span class="font-bold text-[15px] text-gray-800 block">${t.enName}</span>
-                      <span class="text-[12px] font-semibold text-gray-500 block">${t.hiName}</span>
+                      <span class="text-xs font-bold text-emerald-700 block mb-0.5">Test #${t.id}</span>
+                      <span class="font-bold text-[15px] text-gray-800 block leading-tight">${t.enName}</span>
+                      <span class="text-[12px] font-semibold text-gray-500 block mt-0.5">${t.hiName}</span>
                     </div>
                     <span class="px-2.5 py-1 text-[11px] font-bold rounded bg-emerald-100 text-emerald-800 border border-emerald-200 whitespace-nowrap">
                       Available / उपलब्ध
@@ -404,8 +396,9 @@
                 return `
                   <div class="flex justify-between items-start gap-4 py-3 px-3.5 bg-red-50/40 border border-red-100 rounded-xl">
                     <div>
-                      <span class="font-bold text-[15px] text-gray-800 block">${t.enName}</span>
-                      <span class="text-[12px] font-semibold text-gray-500 block">${t.hiName}</span>
+                      <span class="text-xs font-bold text-red-700 block mb-0.5">Test #${t.id}</span>
+                      <span class="font-bold text-[15px] text-gray-800 block leading-tight">${t.enName}</span>
+                      <span class="text-[12px] font-semibold text-gray-500 block mt-0.5">${t.hiName}</span>
                     </div>
                     <div class="text-right flex-shrink-0">
                       <span class="px-2.5 py-1 text-[11px] font-bold rounded bg-red-100 text-red-800 border border-red-200 block mb-1.5 text-center">
